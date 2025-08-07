@@ -1,6 +1,11 @@
-import React from "react";
 import "./AdminPage.css";
+
 import { Link } from "react-router";
+
+import { CardHeader } from "../../components/ui/cardHeader";
+import { CardValue } from "../../components/ui/cardValue";
+import { CardLabel } from "../../components/ui/cardLabel";
+
 export default function AdminPage() {
   return (
     <>
@@ -176,7 +181,11 @@ export default function AdminPage() {
             
           </div>
         </div>
-        <div className="admin-panel-container__right">E</div>
+        <div className="admin-panel-container__right">
+          <CardHeader />
+          <CardValue />
+          <CardLabel />
+        </div>
       </div>
     </>
   );
