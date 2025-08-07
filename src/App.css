@@ -9,15 +9,13 @@ body {
   display: flex;
   justify-content: center; 
   align-items: center;    
-  background-color: hsl(var(--background));
+  background: #fff;
 }
 #root {
   text-align: center;
 }
 
-body {
-  background-color: hsl(var(--background));
-}
+
 .greetings-button {
   transition: 0.2s ease-in;
 }
