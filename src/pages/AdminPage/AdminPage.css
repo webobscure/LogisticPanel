@@ -15,17 +15,26 @@ body {
 }
 
 .admin-panel-container__left {
-    width: 30%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 290px;      /* фиксированная ширина */
+    height: 100vh;
     padding: 10px 0 0 10px;
-    height: 100%;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    overflow-y: auto;  /* если меню высокое */
+}
+.admin-panel-container__right {
+    margin-left: auto; /* чтобы не заходила под левую панель */
+    height: 100vh;
+    overflow-y: auto;
+    width:75%;
 }
 .border-glow {
     box-shadow: 0 0 10px hsl(var(--primary) / 0.3);
+    border: 1px solid hsl(var(--primary) / 0.5);
 }
-.admin-panel-container__right {
-    width: 70%;
-}
+
 
 .admin-panel-container__left-logo {
     display: flex;
@@ -49,7 +58,7 @@ body {
     flex-direction: row;
     align-items: center;
     gap: 1rem;
-    margin: 10px 0 0 20px;
+    margin: 10px 0 0 0px;
 }
 .admin-panel-user-role {
     display: flex;
@@ -94,5 +103,62 @@ body {
     text-align: justify;
 }
 
-.admin-panel-container__left-logo {
+.diagrams {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+.diagrams-item {
+    width: 48%;
+    background: #161b22;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+.diagrams span, .apexcharts-tooltip-title {
+    color: #000;
+}
+.diagrams-item__table {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 70%;
+}
+.diagrams-item__table strong {
+    text-align: left;
+}
+.diagrams-item__table-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.diagrams-item__table-rate {
+    width: 20%;
+}
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    background: #0d0d0d;
+    border-radius: 12px;
+    padding: 15px;
+    color: #fff;
+    width: 50%;
+}
+
+.card-block {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+}
+.kpi-container {
+    display: flex;
+    gap: 1rem;
+    
+}
+.card div {
+    text-align: left;
 }

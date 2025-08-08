@@ -1,0 +1,6 @@
+.active {
+    background-color:  hsl(var(--primary) / 0.2); /* выделение */
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+  }
