@@ -23,12 +23,14 @@ body {
     padding: 10px 0 0 10px;
     box-sizing: border-box;
     overflow-y: auto;  /* если меню высокое */
+    background-color: rgb(80, 80, 254);
 }
 .admin-panel-container__right {
     margin-left: auto; /* чтобы не заходила под левую панель */
     height: 100vh;
     overflow-y: auto;
-    width:75%;
+    width: calc(100vw - 290px); /*занимает оставшуюся ширину экрана*/
+    background-color: rgb(229, 242, 246);
 }
 .border-glow {
     box-shadow: 0 0 10px hsl(var(--primary) / 0.3);

@@ -2,10 +2,12 @@ import "./AdminPage.css";
 import Chart from "react-apexcharts";
 import { FaTelegramPlane, FaWrench, FaUserCog } from "react-icons/fa";
 
-import { CardHeader } from "../../components/ui/cardHeader";
-import { CardValue } from "../../components/ui/cardValue";
-import { CardLabel } from "../../components/ui/cardLabel";
+import { CardHeader } from "../../components/ui/atoms/cardHeader";
+import { CardValue } from "../../components/ui/atoms/cardValue";
+import { CardLabel } from "../../components/ui/atoms/cardLabel";
+import { Card } from "../../components/ui/atoms/Card";
 import Header from "../../components/Header/Header";
+import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
 
 export default function AdminPage() {
 
@@ -93,9 +95,12 @@ export default function AdminPage() {
       <div className="admin-panel-container">
         <Header />
         <div className="admin-panel-container__right">
-          <CardHeader />
-          <CardValue />
-          <CardLabel />
+          <Card>
+            <CardHeader />
+            <CardValue />
+            <CardLabel />
+          </Card>
+          < TotalWorkload></TotalWorkload>
           <div className="diagrams">
             {/* Линейный график */}
             <div className="diagrams-item">
