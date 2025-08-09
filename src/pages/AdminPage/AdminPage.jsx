@@ -8,6 +8,7 @@ import { CardLabel } from "../../components/ui/atoms/cardLabel";
 import { Card } from "../../components/ui/atoms/Card";
 import Header from "../../components/Header/Header";
 import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
+import { MonthlyIncome } from "../../components/ui/molecules/MonthlyIncome";
 
 export default function AdminPage() {
 
@@ -95,7 +96,8 @@ export default function AdminPage() {
       <div className="admin-panel-container">
         <Header />
         <div className="admin-panel-container__right">
-          < TotalWorkload></TotalWorkload>
+          <TotalWorkload></TotalWorkload>
+          <MonthlyIncome></MonthlyIncome>
           <div className="diagrams">
             {/* Линейный график */}
             <div className="diagrams-item">
