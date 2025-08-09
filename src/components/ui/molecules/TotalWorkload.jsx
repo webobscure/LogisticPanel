@@ -5,7 +5,6 @@ import { CardLabel } from "../atoms/cardLabel";
 
 export const TotalWorkload = ({ 
   title = 'Общая нагрузка', 
-  value = '0', 
   text = 'ТС',
   statuses = [
     { amount: 24, status: 'inWork' },
@@ -18,13 +17,20 @@ export const TotalWorkload = ({
     broken: 'red'
   }
 }) => {
+  // Вычисляем общее количество машин
+  const totalValue = statuses.reduce((sum, status) => sum + status.amount, 0);
+
   return (
     <Card>
-      <CardHeader>{title}</CardHeader>
+      <CardHeader 
+        title={title} 
+        iconType="load" 
+        color="#4F46E5" 
+      />
 
-      <CardValue value={value} text={text} />
+      <CardValue value={totalValue} text={text} />
 
-      <div style={{ display: 'flex', gap: '1rem', color: 'black' }}>
+      <div style={{ display: 'flex', gap: '1rem', color:'black' }}>
         {statuses.map((statusInfo, index) => (
           <CardLabel 
             key={index}

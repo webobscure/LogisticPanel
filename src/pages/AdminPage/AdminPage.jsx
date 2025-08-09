@@ -95,11 +95,6 @@ export default function AdminPage() {
       <div className="admin-panel-container">
         <Header />
         <div className="admin-panel-container__right">
-          <Card>
-            <CardHeader />
-            <CardValue />
-            <CardLabel />
-          </Card>
           < TotalWorkload></TotalWorkload>
           <div className="diagrams">
             {/* Линейный график */}

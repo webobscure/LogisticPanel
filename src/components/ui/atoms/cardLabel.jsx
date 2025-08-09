@@ -18,7 +18,7 @@ const StatusAmount = styled.span`
 `;
 
 const StatusText = styled.span`
-  color: #666;
+  color: black;
 `;
 
 const STATUS_CONFIG = {
