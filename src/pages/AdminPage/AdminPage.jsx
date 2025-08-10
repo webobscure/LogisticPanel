@@ -10,6 +10,7 @@ import Header from "../../components/Header/Header";
 import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
 import { MonthlyIncome } from "../../components/ui/molecules/MonthlyIncome";
 import { TotalEfficiency } from "../../components/ui/molecules/TotalEfficiency";
+import { TopBlock } from "../../components/ui/organisms/TopBlock";
 
 export default function AdminPage() {
 
@@ -97,9 +98,7 @@ export default function AdminPage() {
       <div className="admin-panel-container">
         <Header />
         <div className="admin-panel-container__right">
-          <TotalWorkload />
-          <MonthlyIncome />
-          <TotalEfficiency />
+          <TopBlock />
           <div className="diagrams">
             {/* Линейный график */}
             <div className="diagrams-item">
