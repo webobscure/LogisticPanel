@@ -1,7 +1,8 @@
 :root {
   --background: 225 15% 6%;
   --primary: 192 100% 67%;
-  --primary: 192 100% 67%;
+  --border: 225 15% 15%;
+  --border-light: 210 40% 95%;
   --gradient-primary: linear-gradient(135deg, hsl(192 100% 67%), hsl(270 100% 80%));
   --description: rgb(148, 166, 184);
   --gradient-cyber: linear-gradient(90deg, hsl(192 100% 67%) 0%, hsl(270 100% 80%) 50%, hsl(300 100% 70%) 100%);
@@ -16,7 +17,24 @@ body {
 #root {
   text-align: center;
 }
-
+table td {
+  text-align: center;
+}
+.table-status {
+  max-width: 250px;
+  width: 10%;
+}
+.bg-card-light {
+  background-color: hsl(210, 40%, 98%);
+  border: 1px solid hsl(210, 40%, 90%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  border-radius: var(--radius);
+  color: hsl(210, 10%, 30%);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin: 10px;
+    
+}
 
 .greetings-button {
   transition: 0.2s ease-in;
@@ -59,4 +77,13 @@ body {
 
 .read-the-docs {
   color: #888;
+}
+.ui-select:hover {
+  border-color: #888;
+}
+
+.ui-select:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 3px rgba(25, 118, 210, 0.4);
 }

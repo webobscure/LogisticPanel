@@ -17,7 +17,7 @@ export default function AdminPage() {
   
   // ===== Линейный график =====
   const lineOptions = {
-    chart: { toolbar: { show: false }, foreColor: "#fff" },
+    chart: { toolbar: { show: false }, foreColor: "#000" },
     stroke: { curve: "smooth", width: 2 },
     grid: { borderColor: "rgba(255,255,255,0.1)" },
     xaxis: { categories: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн"] },
@@ -34,7 +34,7 @@ export default function AdminPage() {
 
   // ===== Кольцевая диаграмма =====
   const donutOptions = {
-    chart: { toolbar: { show: false }, foreColor: "#fff" },
+    chart: { toolbar: { show: false }, foreColor: "#000" },
     labels: ["Загружено", "Простой", "На СТО"],
     colors: ["#00E5FF", "#D57DFF", "#FF4B4B"],
     legend: { position: "bottom" },
@@ -43,7 +43,7 @@ export default function AdminPage() {
 
   // ===== Столбчатый график =====
   const barOptions = {
-    chart: { toolbar: { show: false }, foreColor: "#fff" },
+    chart: { toolbar: { show: false }, foreColor: "#000" },
     plotOptions: { bar: { horizontal: false, columnWidth: "40%" } },
     dataLabels: { enabled: false },
     xaxis: {
@@ -101,7 +101,7 @@ export default function AdminPage() {
           <TopBlock />
           <div className="diagrams">
             {/* Линейный график */}
-            <div className="diagrams-item">
+            <div className="diagrams-item bg-card-light">
               <h3>Динамика по месяцам</h3>
               <Chart
                 options={lineOptions}
@@ -112,7 +112,7 @@ export default function AdminPage() {
             </div>
 
             {/* Кольцевая диаграмма */}
-            <div className="diagrams-item">
+            <div className="diagrams-item  bg-card-light">
               <h3>Распределение ТС</h3>
               <Chart
                 options={donutOptions}
@@ -123,7 +123,7 @@ export default function AdminPage() {
             </div>
 
             {/* Столбчатый график */}
-            <div className="diagrams-item">
+            <div className="diagrams-item  bg-card-light">
               <h3>Эффективность водителей</h3>
               <Chart
                 options={barOptions}
@@ -134,7 +134,7 @@ export default function AdminPage() {
             </div>
 
             {/* Карточки с данными */}
-            <div className="diagrams-item">
+            <div className="diagrams-item  bg-card-light">
               <h3 style={titleStyle}>Доходность по ТС</h3>
               <div
                 style={{
@@ -147,14 +147,13 @@ export default function AdminPage() {
                   <div
                     key={item.id}
                     style={{
-                      background: "#0F1620",
                       padding: "15px",
                       display: "flex",
                       justifyContent: "space-between",
                       borderRadius: "15px",
                       margin: "10px",
                     }}
-                    className="border-glow"
+                    className=" bg-card-light"
                   >
                     <div className="diagrams-item__table">
                       <strong>{item.id}</strong>
@@ -221,7 +220,7 @@ export default function AdminPage() {
              className="card-container kpi-container"
             >
               {/* Водители */}
-              <div className="card">
+              <div className="card ">
                 <h3
                   style={{
                     color: "#0ff",
@@ -236,7 +235,6 @@ export default function AdminPage() {
                   <div
                     key={i}
                     style={{
-                      background: "#1a1a1a",
                       padding: "10px",
                       borderRadius: "8px",
                       marginTop: "10px",
@@ -244,6 +242,7 @@ export default function AdminPage() {
                       justifyContent: "space-between",
                       alignItems: "center",
                     }}
+                    className="bg-card-light "
                   >
                     <div>
                       <strong>{d.name}</strong>
@@ -256,14 +255,13 @@ export default function AdminPage() {
                       target="_blank"
                       rel="noreferrer"
                       style={{
-                        background: "#0ff2",
+                        background: "rgb(229, 242, 246)",
                         padding: "6px 10px",
                         borderRadius: "6px",
                         display: "flex",
                         alignItems: "center",
                         gap: "5px",
                         textDecoration: "none",
-                        color: "#fff",
                       }}
                     >
                       <FaTelegramPlane /> Telegram
@@ -288,7 +286,6 @@ export default function AdminPage() {
                   <div
                     key={i}
                     style={{
-                      background: "#1a1a1a",
                       padding: "10px",
                       borderRadius: "8px",
                       marginTop: "10px",
@@ -296,6 +293,7 @@ export default function AdminPage() {
                       justifyContent: "space-between",
                       alignItems: "center",
                     }}
+                    className="bg-card-light "
                   >
                     <div>
                       <strong>{m.name}</strong>
@@ -308,14 +306,13 @@ export default function AdminPage() {
                       target="_blank"
                       rel="noreferrer"
                       style={{
-                        background: "#0ff2",
+                        background: "rgb(229, 242, 246)",
                         padding: "6px 10px",
                         borderRadius: "6px",
                         display: "flex",
                         alignItems: "center",
                         gap: "5px",
                         textDecoration: "none",
-                        color: "#fff",
                       }}
                     >
                       <FaTelegramPlane /> Telegram

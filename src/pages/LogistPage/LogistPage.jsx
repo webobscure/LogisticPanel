@@ -17,12 +17,13 @@ import {
 } from "react-icons/fa";
 import "./LogistPage.css";
 import { FiAlertTriangle } from "react-icons/fi";
-import ErrorReport from "../../components/ErrorReport";
+import ErrorReport from "../../components/tables/ErrorReport/ErrorReport";
+import RacesToday from "../../components/tables/RacesToday";
 
 export default function LogistPage() {
   // ===== Линейный график =====
   const lineOptions = {
-    chart: { toolbar: { show: false }, foreColor: "#fff" },
+    chart: { toolbar: { show: false }, foreColor: "#000" },
     stroke: { curve: "smooth", width: 2 },
     grid: { borderColor: "rgba(255,255,255,0.1)" },
     xaxis: { categories: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] },
@@ -39,7 +40,7 @@ export default function LogistPage() {
 
   // ===== Столбчатый график =====
   const barOptions = {
-    chart: { toolbar: { show: false }, foreColor: "#fff" },
+    chart: { toolbar: { show: false }, foreColor: "#000" },
     plotOptions: { bar: { horizontal: false, columnWidth: "40%" } },
     dataLabels: { enabled: false },
     xaxis: {
@@ -81,75 +82,7 @@ export default function LogistPage() {
     },
   ];
 
-  const [trips, setTrips] = useState([
-    {
-      id: 1,
-      firstName: "Иван",
-      lastName: "Иванов",
-      driver: "Иванов И.И.",
-      telegram: "@ivanov_driver",
-      vehicle: "ТС-001",
-      carNumber: "А123БВ",
-      routeStart: "Москва",
-      routeEnd: "Спб",
-      route: "Москва → Спб",
-      date: "2024-01-15",
-      status: "в пути",
-      comment: "Обычный рейс",
-      customerContacts: "+7 123 456 7890",
-      loadingDateTime: "2024-01-15T08:00",
-    },
-    {
-      id: 2,
-      firstName: "Петр",
-      lastName: "Петров",
-      driver: "Петров П.П.",
-      telegram: "@petrov_driver",
-      vehicle: "ТС-002",
-      carNumber: "В456ГД",
-      routeStart: "Спб",
-      routeEnd: "Москва",
-      route: "Спб → Москва",
-      date: "2024-01-15",
-      status: "ожидает",
-      comment: "Срочная доставка",
-      customerContacts: "+7 098 765 4321",
-      loadingDateTime: "2024-01-15T14:30",
-    },
-    {
-      id: 3,
-      firstName: "Сергей",
-      lastName: "Сидоров",
-      driver: "Сидоров С.С.",
-      telegram: "@sidorov_driver",
-      vehicle: "ТС-003",
-      carNumber: "Г789ЕЖ",
-      routeStart: "Москва",
-      routeEnd: "Казань",
-      route: "Москва → Казань",
-      date: "2024-01-15",
-      status: "проблемный",
-      comment: "Требуется особое внимание",
-      customerContacts: "+7 555 111 2233",
-      loadingDateTime: "2024-01-15T10:15",
-    },
-  ]);
-  const [statusFilter, setStatusFilter] = useState("");
-  const [selectedTrip, setSelectedTrip] = useState(null);
 
-  const statuses = ["в пути", "ожидает", "проблемный"];
-
-  // Обновляем статус конкретного рейса
-  const handleStatusChange = (id, newStatus) => {
-    setTrips((prevTrips) =>
-      prevTrips.map((trip) =>
-        trip.id === id ? { ...trip, status: newStatus } : trip
-      )
-    );
-  };
-
-  // Закрыть попап
-  const closeModal = () => setSelectedTrip(null);
 
 
 
@@ -157,9 +90,9 @@ export default function LogistPage() {
     <div className="admin-panel-container">
       <Header />
       <div className="admin-panel-container__right">
-        <div className="diagrams">
+        <div className="diagrams ">
           {/* Линейный график */}
-          <div className="diagrams-item">
+          <div className="diagrams-item bg-card-light">
             <h3>Динамика по месяцам</h3>
             <Chart
               options={lineOptions}
@@ -170,7 +103,7 @@ export default function LogistPage() {
           </div>
 
           {/* Столбчатый график */}
-          <div className="diagrams-item">
+          <div className="diagrams-item bg-card-light">
             <h3>Эффективность водителей</h3>
             <Chart
               options={barOptions}
@@ -184,12 +117,12 @@ export default function LogistPage() {
           style={{
             display: "flex",
             gap: "20px",
-            padding: "20px",
             flexDirection: "column",
           }}
+          className="bg-card-light"
         >
           {/* Затраты */}
-          <div className="card-container">
+          <div className="card-container  ">
             <h3
               style={{
                 color: "#0ff",
@@ -200,7 +133,7 @@ export default function LogistPage() {
             >
               <FaClock /> Детализация по маршрутам
             </h3>
-            <div className="card-block four">
+            <div className="card-block four ">
               {detailsData.map((d, i) => (
                 <div key={i} className="card border-glow">
                   <div className="card-detail">
@@ -227,145 +160,7 @@ export default function LogistPage() {
             </div>
           </div>
         </div>
-        <div className="racestoday">
-          <div className="racestoday-block">
-            <h1>
-              <FaMap /> Рейсы на сегодня
-            </h1>
-            <button>
-              <FaPlus /> Добавить новый рейс
-            </button>
-          </div>
-          <div className="racestoday-filter">
-            <h1>Фильтры по статусу</h1>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">Все статусы</option>
-              <option value="в пути">В пути</option>
-              <option value="ожидает">Ожидает</option>
-              <option value="проблемный">Проблемный</option>
-            </select>
-          </div>
-          <table
-            border="1"
-            cellPadding="8"
-            style={{ marginTop: 20, width: "100%", borderCollapse: "collapse" }}
-          >
-            <thead>
-              <tr>
-                <th>Водитель</th>
-                <th>ТС</th>
-                <th>Маршрут</th>
-                <th>Дата</th>
-                <th>Статус</th>
-                <th>Кнопка</th>
-              </tr>
-            </thead>
-            <tbody>
-              {trips
-                .filter(
-                  (trip) => statusFilter === "" || trip.status === statusFilter
-                )
-                .map((trip) => (
-                  <tr key={trip.id}>
-                    <td>{trip.driver}</td>
-                    <td>{trip.vehicle}</td>
-                    <td>{trip.route}</td>
-                    <td>{trip.date}</td>
-                    <td>
-                      <select
-                        value={trip.status}
-                        onChange={(e) =>
-                          handleStatusChange(trip.id, e.target.value)
-                        }
-                      >
-                        {statuses.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <button onClick={() => setSelectedTrip(trip)}>
-                        Информация
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-
-          {/* Модальное окно с информацией */}
-          {selectedTrip && (
-            <div
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.5)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 1000,
-              }}
-              onClick={closeModal}
-            >
-              <div
-                style={{
-                  backgroundColor: "#fff",
-                  padding: 20,
-                  borderRadius: 8,
-                  minWidth: 300,
-                  maxWidth: "90%",
-                  position: "relative",
-                }}
-                onClick={(e) => e.stopPropagation()} // чтобы клик внутри не закрывал
-              >
-                <h3>Детали рейса</h3>
-                <p>
-                  <strong>Водитель:</strong> {selectedTrip.driver}
-                </p>
-                <p>
-                  <strong>Телеграм:</strong> {selectedTrip.telegram}
-                </p>
-                <p>
-                  <strong>ТС:</strong> {selectedTrip.vehicle} (
-                  {selectedTrip.carNumber})
-                </p>
-                <p>
-                  <strong>Маршрут:</strong> {selectedTrip.routeStart} →{" "}
-                  {selectedTrip.routeEnd}
-                </p>
-                <p>
-                  <strong>Дата:</strong> {selectedTrip.date}
-                </p>
-                <p>
-                  <strong>Статус:</strong> {selectedTrip.status}
-                </p>
-                <p>
-                  <strong>Комментарий:</strong> {selectedTrip.comment}
-                </p>
-                <p>
-                  <strong>Контакты клиента:</strong>{" "}
-                  {selectedTrip.customerContacts}
-                </p>
-                <p>
-                  <strong>Дата и время загрузки:</strong>{" "}
-                  {selectedTrip.loadingDateTime}
-                </p>
-
-                <button onClick={closeModal} style={{ marginTop: 10 }}>
-                  Закрыть
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        <RacesToday />
         <ErrorReport />
       </div>
     </div>

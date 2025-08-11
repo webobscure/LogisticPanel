@@ -21,7 +21,8 @@
     max-height: 40px;
 }
 .text-primary {
-    color: hsl(var(--primary));
+    color: #222;
+    font-weight: 600;
 }
 .racestoday-filter {
     display: flex;

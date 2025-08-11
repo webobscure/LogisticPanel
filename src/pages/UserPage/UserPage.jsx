@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Header from "../../components/Header/Header";
-import { FaUser } from "react-icons/fa";
+import { FaSearch, FaUser } from "react-icons/fa";
+import "./UserPage.css";
+import UiSelect from "../../components/ui/atoms/select";
 
 export default function UserPage() {
   const [users, setUsers] = useState([
@@ -13,6 +15,7 @@ export default function UserPage() {
       carNumber: "А123БВ",
       userType: "водитель",
       verified: true,
+      banned: false,
     },
     {
       id: 2,
@@ -23,6 +26,7 @@ export default function UserPage() {
       carNumber: "В456ГД",
       userType: "водитель",
       verified: true,
+      banned: false,
     },
     {
       id: 3,
@@ -33,6 +37,7 @@ export default function UserPage() {
       carNumber: null,
       userType: "механик",
       verified: true,
+      banned: false,
     },
     {
       id: 4,
@@ -43,6 +48,7 @@ export default function UserPage() {
       carNumber: null,
       userType: "логист",
       verified: false,
+      banned: false,
     },
     {
       id: 5,
@@ -53,10 +59,10 @@ export default function UserPage() {
       carNumber: null,
       userType: "руководитель",
       verified: true,
+      banned: false,
     },
   ]);
 
-  const [filteredUsers, setFilteredUsers] = useState(users);
   const [searchFilters, setSearchFilters] = useState({
     firstName: "",
     lastName: "",
@@ -67,13 +73,21 @@ export default function UserPage() {
     verified: "all",
   });
 
-  const userTypes = ["водитель", "логист", "руководитель", "механик"];
+  const userTypes = [
+    { value: "водитель", label: "водитель" },
+    { value: "логист", label: "логист" },
+    { value: "руководитель", label: "руководитель" },
+    { value: "механик", label: "механик" },
+  ];
 
-  const handleFilterChange = (field, value) => {
-    const newFilters = { ...searchFilters, [field]: value };
-    setSearchFilters(newFilters);
+  const verifiedOptions = [
+    { value: "all", label: "Все статусы верификации" },
+    { value: "true", label: "Верифицирован" },
+    { value: "false", label: "Не верифицирован" },
+  ];
 
-    const filtered = users.filter((user) => {
+  const filterUsers = (usersList, filters) => {
+    return usersList.filter((user) => {
       if (!user) return false;
 
       const firstName = user.firstName || "";
@@ -82,25 +96,30 @@ export default function UserPage() {
       const vehicle = user.vehicle || "";
       const carNumber = user.carNumber || "";
       const userType = user.userType || "";
+      const verifiedString = user.verified ? "true" : "false";
 
       return (
-        firstName.toLowerCase().includes(newFilters.firstName.toLowerCase()) &&
-        lastName.toLowerCase().includes(newFilters.lastName.toLowerCase()) &&
-        middleName
-          .toLowerCase()
-          .includes(newFilters.middleName.toLowerCase()) &&
-        vehicle.toLowerCase().includes(newFilters.vehicle.toLowerCase()) &&
-        carNumber.toLowerCase().includes(newFilters.carNumber.toLowerCase()) &&
-        (newFilters.userType === "all" ||
-          newFilters.userType === "" ||
-          userType === newFilters.userType) &&
-        (newFilters.verified === "all" ||
-          newFilters.verified === "" ||
-          user.verified.toString() === newFilters.verified)
+        firstName.toLowerCase().includes(filters.firstName.toLowerCase()) &&
+        lastName.toLowerCase().includes(filters.lastName.toLowerCase()) &&
+        middleName.toLowerCase().includes(filters.middleName.toLowerCase()) &&
+        vehicle.toLowerCase().includes(filters.vehicle.toLowerCase()) &&
+        carNumber.toLowerCase().includes(filters.carNumber.toLowerCase()) &&
+        (filters.userType === "all" ||
+          filters.userType === "" ||
+          userType === filters.userType) &&
+        (filters.verified === "all" ||
+          filters.verified === "" ||
+          verifiedString === filters.verified)
       );
     });
+  };
 
-    setFilteredUsers(filtered);
+  const [filteredUsers, setFilteredUsers] = useState(users);
+
+  const handleFilterChange = (field, value) => {
+    const newFilters = { ...searchFilters, [field]: value };
+    setSearchFilters(newFilters);
+    setFilteredUsers(filterUsers(users, newFilters));
   };
 
   const handleRoleChange = (userId, newRole) => {
@@ -108,39 +127,7 @@ export default function UserPage() {
       user.id === userId ? { ...user, userType: newRole } : user
     );
     setUsers(updatedUsers);
-
-    // Apply current filters to updated data
-    const filtered = updatedUsers.filter((user) => {
-      if (!user) return false;
-
-      const firstName = user.firstName || "";
-      const lastName = user.lastName || "";
-      const middleName = user.middleName || "";
-      const vehicle = user.vehicle || "";
-      const carNumber = user.carNumber || "";
-      const userType = user.userType || "";
-
-      return (
-        firstName
-          .toLowerCase()
-          .includes(searchFilters.firstName.toLowerCase()) &&
-        lastName.toLowerCase().includes(searchFilters.lastName.toLowerCase()) &&
-        middleName
-          .toLowerCase()
-          .includes(searchFilters.middleName.toLowerCase()) &&
-        vehicle.toLowerCase().includes(searchFilters.vehicle.toLowerCase()) &&
-        carNumber
-          .toLowerCase()
-          .includes(searchFilters.carNumber.toLowerCase()) &&
-        (searchFilters.userType === "all" ||
-          searchFilters.userType === "" ||
-          userType === searchFilters.userType) &&
-        (searchFilters.verified === "all" ||
-          searchFilters.verified === "" ||
-          user.verified.toString() === searchFilters.verified)
-      );
-    });
-    setFilteredUsers(filtered);
+    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
   };
 
   const handleVerificationToggle = (userId, verified) => {
@@ -148,71 +135,96 @@ export default function UserPage() {
       user.id === userId ? { ...user, verified } : user
     );
     setUsers(updatedUsers);
+    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
+  };
 
-    // Apply current filters to updated data
-    const filtered = updatedUsers.filter((user) => {
-      if (!user) return false;
-
-      const firstName = user.firstName || "";
-      const lastName = user.lastName || "";
-      const middleName = user.middleName || "";
-      const vehicle = user.vehicle || "";
-      const carNumber = user.carNumber || "";
-      const userType = user.userType || "";
-
-      return (
-        firstName
-          .toLowerCase()
-          .includes(searchFilters.firstName.toLowerCase()) &&
-        lastName.toLowerCase().includes(searchFilters.lastName.toLowerCase()) &&
-        middleName
-          .toLowerCase()
-          .includes(searchFilters.middleName.toLowerCase()) &&
-        vehicle.toLowerCase().includes(searchFilters.vehicle.toLowerCase()) &&
-        carNumber
-          .toLowerCase()
-          .includes(searchFilters.carNumber.toLowerCase()) &&
-        (searchFilters.userType === "all" ||
-          searchFilters.userType === "" ||
-          userType === searchFilters.userType) &&
-        (searchFilters.verified === "all" ||
-          searchFilters.verified === "" ||
-          user.verified.toString() === searchFilters.verified)
-      );
+  const handleBanToggle = (userId) => {
+    const updatedUsers = users.map((user) => {
+      if (user.id === userId) {
+        const newBanned = !user.banned;
+        return { ...user, banned: newBanned, verified: !newBanned };
+      }
+      return user;
     });
-    setFilteredUsers(filtered);
+    setUsers(updatedUsers);
+    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
   };
 
-  const getUserTypeColor = (userType) => {
-    switch (userType) {
-      case "водитель":
-        return "default";
-      case "логист":
-        return "secondary";
-      case "руководитель":
-        return "destructive";
-      case "механик":
-        return "outline";
-      default:
-        return "outline";
-    }
-  };
   return (
     <div className="admin-panel-container">
       <Header />
       <div className="admin-panel-container__right">
         <div className="users">
-          <div className="users-title">
-            <FaUser /> Пользователи ({users.length})
-            <table
-              border="1"
-              cellPadding="8"
-              style={{
-                marginTop: 20,
-                width: "100%",
-                borderCollapse: "collapse",
-              }}
-            >
+          {/* Форма поиска */}
+          <div className="filter bg-card-light">
+            <div className="filter-title">
+              <FaSearch /> Поиск пользователей
+            </div>
+            <div className="filter-form">
+              <input
+                type="text"
+                placeholder="Фамилия"
+                value={searchFilters.lastName}
+                onChange={(e) => handleFilterChange("lastName", e.target.value)}
+                className="filter-input"
+              />
+              <input
+                type="text"
+                placeholder="Имя"
+                value={searchFilters.firstName}
+                onChange={(e) => handleFilterChange("firstName", e.target.value)}
+                className="filter-input"
+              />
+              <input
+                type="text"
+                placeholder="Отчество"
+                value={searchFilters.middleName}
+                onChange={(e) => handleFilterChange("middleName", e.target.value)}
+                className="filter-input"
+              />
+              <input
+                type="text"
+                placeholder="ТС"
+                value={searchFilters.vehicle}
+                onChange={(e) => handleFilterChange("vehicle", e.target.value)}
+                className="filter-input"
+              />
+              <input
+                type="text"
+                placeholder="Номер машины"
+                value={searchFilters.carNumber}
+                onChange={(e) => handleFilterChange("carNumber", e.target.value)}
+                className="filter-input"
+              />
+
+              <UiSelect
+                options={[{ value: "all", label: "Все роли" }, ...userTypes]}
+                value={searchFilters.userType}
+                onChange={(val) => handleFilterChange("userType", val)}
+                placeholder=""
+                className="filter-select"
+              />
+
+              <UiSelect
+                options={verifiedOptions}
+                value={searchFilters.verified}
+                onChange={(val) => handleFilterChange("verified", val)}
+                placeholder=""
+                className="filter-select"
+              />
+            </div>
+          </div>
+
+          {/* Таблица пользователей */}
+          <div className="table-users bg-card-light">
+            <div className="users-title">
+              <FaUser
+                size={24}
+                style={{ marginRight: 8, verticalAlign: "middle" }}
+              />
+              <span className="title-text">Пользователи ({users.length})</span>
+            </div>
+            <table className="users-table">
               <thead>
                 <tr>
                   <th>ФИО</th>
@@ -224,21 +236,22 @@ export default function UserPage() {
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user.id} className={user.banned ? "banned-row" : ""}>
                     <td>{`${user.lastName} ${user.firstName} ${user.middleName}`}</td>
-                    <td>{user.vehicle || "-"}<br/>{user.carNumber || "-"}</td>
-                    <td><select
+                    <td>
+                      {user.vehicle || "-"}
+                      <br />
+                      {user.carNumber || "-"}
+                    </td>
+                    <td>
+                      <UiSelect
+                        options={userTypes}
                         value={user.userType}
-                        onChange={(e) =>
-                          handleRoleChange(user.id, e.target.value)
-                        }
-                      >
-                        <option value="водитель">водитель</option>
-                        <option value="логист">логист</option>
-                        <option value="руководитель">руководитель</option>
-                        <option value="механик">механик</option>
-                      </select></td>
-                    
+                        onChange={(val) => handleRoleChange(user.id, val)}
+                        placeholder="Выберите роль"
+                        className="role-select"
+                      />
+                    </td>
                     <td>
                       <input
                         type="checkbox"
@@ -246,7 +259,21 @@ export default function UserPage() {
                         onChange={(e) =>
                           handleVerificationToggle(user.id, e.target.checked)
                         }
+                        className="verification-checkbox"
                       />
+                    </td>
+                    <td className="action-cell">
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          checked={user.banned}
+                          onChange={() => handleBanToggle(user.id)}
+                        />
+                        <span className="slider" />
+                      </label>
+                      <span className="action-label">
+                        {user.banned ? "Верифицировать" : "Забанить"}
+                      </span>
                     </td>
                   </tr>
                 ))}
