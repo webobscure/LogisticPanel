@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { FaMap, FaPlus } from "react-icons/fa";
 import UiSelect from "../ui/atoms/select";
+import UiTable from "../ui/atoms/table";
+import UiTableButton from "../ui/atoms/button";
+import UiModal from "../ui/atoms/modal";
 
 export default function RacesToday() {
   const [statusFilter, setStatusFilter] = useState("");
@@ -62,13 +65,18 @@ export default function RacesToday() {
 
   const handleStatusChange = (id, newStatus) => {
     setTrips((prev) =>
-      prev.map((trip) => (trip.id === id ? { ...trip, status: newStatus } : trip))
+      prev.map((trip) =>
+        trip.id === id ? { ...trip, status: newStatus } : trip
+      )
     );
   };
 
   const closeModal = () => setSelectedTrip(null);
 
-  const handleAddTrip = () => {
+  // ВАЖНО: Отменяем дефолтное поведение формы
+  const handleAddTrip = (e) => {
+    e.preventDefault();
+
     if (
       newTrip.driver.trim() &&
       newTrip.vehicle.trim() &&
@@ -101,18 +109,19 @@ export default function RacesToday() {
   };
 
   return (
-    <div className="racestoday bg-card-light ">
+    <div className="racestoday bg-card-light">
       <div className="racestoday-block">
         <h1>
           <FaMap /> Рейсы на сегодня
         </h1>
-        <button onClick={() => setIsAddTripDialogOpen(true)}>
-          <FaPlus /> Добавить новый рейс
-        </button>
+        <UiTableButton
+          label="Добавить ТО"
+          icon={FaPlus}
+          onClick={() => setIsAddTripDialogOpen(true)}
+        />
       </div>
 
       <div className="racestoday-filter">
-
         <UiSelect
           value={statusFilter}
           onChange={setStatusFilter}
@@ -122,46 +131,38 @@ export default function RacesToday() {
         />
       </div>
 
-      <table
-        border="1"
-        cellPadding="8"
-        style={{ marginTop: 20, width: "100%", borderCollapse: "collapse" }}
-      >
-        <thead>
-          <tr>
-            <th>Водитель</th>
-            <th>ТС</th>
-            <th>Маршрут</th>
-            <th>Дата</th>
-            <th className="table-status">Статус</th>
-            <th>Кнопка</th>
-          </tr>
-        </thead>
-        <tbody>
-          {trips
-            .filter((trip) => statusFilter === "" || trip.status === statusFilter)
-            .map((trip) => (
-              <tr key={trip.id}>
-                <td>{trip.driver}</td>
-                <td>{trip.vehicle}</td>
-                <td>{trip.route}</td>
-                <td>{trip.date}</td>
-                <td className="table-status">
-                   <UiSelect
-          value={trip.status}
-          onChange={(e) => handleStatusChange(trip.id, e.target.value)}
-          placeholder="Выберите статус"
-          options={statuses}
-        />
-                 
-                </td>
-                <td>
-                  <button onClick={() => setSelectedTrip(trip)}>Информация</button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      <UiTable
+        columns={[
+          { header: "Водитель", render: (t) => t.driver },
+          { header: "ТС", render: (t) => t.vehicle },
+          { header: "Маршрут", render: (t) => t.route },
+          { header: "Дата", render: (t) => t.date },
+          {
+            header: "Статус",
+            className: "table-status",
+            render: (t) => (
+              <UiSelect
+                value={t.status}
+                onChange={(val) => handleStatusChange(t.id, val)}
+                placeholder="Выберите статус"
+                options={statuses}
+              />
+            ),
+          },
+          {
+            header: "Кнопка",
+            render: (t) => (
+              <UiTableButton
+                label="Информация"
+                onClick={() => setSelectedTrip(t)}
+              />
+            ),
+          },
+        ]}
+        data={trips.filter(
+          (trip) => statusFilter === "" || trip.status === statusFilter
+        )}
+      />
 
       {/* Модалка добавления рейса */}
       {isAddTripDialogOpen && (
@@ -192,136 +193,172 @@ export default function RacesToday() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Добавить новый рейс</h3>
-            <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
-              <input
-                type="text"
-                placeholder="Водитель"
-                value={newTrip.driver}
-                onChange={(e) => setNewTrip({ ...newTrip, driver: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Телеграм"
-                value={newTrip.telegram}
-                onChange={(e) => setNewTrip({ ...newTrip, telegram: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="ТС"
-                value={newTrip.vehicle}
-                onChange={(e) => setNewTrip({ ...newTrip, vehicle: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Госномер"
-                value={newTrip.carNumber}
-                onChange={(e) => setNewTrip({ ...newTrip, carNumber: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Начало маршрута"
-                value={newTrip.routeStart}
-                onChange={(e) => setNewTrip({ ...newTrip, routeStart: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Конец маршрута"
-                value={newTrip.routeEnd}
-                onChange={(e) => setNewTrip({ ...newTrip, routeEnd: e.target.value })}
-              />
-              <input
-                type="date"
-                value={newTrip.date}
-                onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
-              />
-              <input
-                type="datetime-local"
-                value={newTrip.loadingDateTime}
-                onChange={(e) => setNewTrip({ ...newTrip, loadingDateTime: e.target.value })}
-              />
-              <textarea
-                placeholder="Комментарий"
-                value={newTrip.comment}
-                onChange={(e) => setNewTrip({ ...newTrip, comment: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Контакты клиента"
-                value={newTrip.customerContacts}
-                onChange={(e) => setNewTrip({ ...newTrip, customerContacts: e.target.value })}
-              />
-            </div>
-
-            <div style={{ marginTop: 15, display: "flex", gap: 10 }}>
-              <button onClick={handleAddTrip}>Добавить</button>
-              <button onClick={() => setIsAddTripDialogOpen(false)}>Отмена</button>
-            </div>
+            <UiModal
+              title="Добавить рейс"
+              onClose={() => setIsAddTripDialogOpen(false)}
+            >
+              <form className="modal-form" onSubmit={handleAddTrip}>
+                <input
+                  type="text"
+                  placeholder="Водитель"
+                  value={newTrip.driver}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, driver: e.target.value })
+                  }
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Телеграм"
+                  value={newTrip.telegram}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, telegram: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="ТС"
+                  value={newTrip.vehicle}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, vehicle: e.target.value })
+                  }
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Госномер"
+                  value={newTrip.carNumber}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, carNumber: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Начало маршрута"
+                  value={newTrip.routeStart}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, routeStart: e.target.value })
+                  }
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Конец маршрута"
+                  value={newTrip.routeEnd}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, routeEnd: e.target.value })
+                  }
+                  required
+                />
+                <input
+                  type="date"
+                  value={newTrip.date}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, date: e.target.value })
+                  }
+                  required
+                />
+                <input
+                  type="datetime-local"
+                  value={newTrip.loadingDateTime}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, loadingDateTime: e.target.value })
+                  }
+                  required
+                />
+                <textarea
+                  placeholder="Комментарий"
+                  value={newTrip.comment}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, comment: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Контакты клиента"
+                  value={newTrip.customerContacts}
+                  onChange={(e) =>
+                    setNewTrip({ ...newTrip, customerContacts: e.target.value })
+                  }
+                />
+                <button type="submit" className="ui-table-button">
+                  Сохранить
+                </button>
+              </form>
+            </UiModal>
           </div>
         </div>
       )}
 
       {/* Модальное окно информации */}
       {selectedTrip && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-          onClick={closeModal}
-        >
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: 20,
-              borderRadius: 8,
-              minWidth: 300,
-              maxWidth: "90%",
-              position: "relative",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>Детали рейса</h3>
-            <p>
-              <strong>Водитель:</strong> {selectedTrip.driver}
-            </p>
-            <p>
-              <strong>Телеграм:</strong> {selectedTrip.telegram}
-            </p>
-            <p>
-              <strong>ТС:</strong> {selectedTrip.vehicle} ({selectedTrip.carNumber})
-            </p>
-            <p>
-              <strong>Маршрут:</strong> {selectedTrip.route}
-            </p>
-            <p>
-              <strong>Дата:</strong> {selectedTrip.date}
-            </p>
-            <p>
-              <strong>Статус:</strong> {selectedTrip.status}
-            </p>
-            <p>
-              <strong>Комментарий:</strong> {selectedTrip.comment}
-            </p>
-            <p>
-              <strong>Контакты клиента:</strong> {selectedTrip.customerContacts}
-            </p>
-            <p>
-              <strong>Дата и время загрузки:</strong> {selectedTrip.loadingDateTime}
-            </p>
+        <UiModal title="Детали рейса" onClose={closeModal}>
+          <div className="details-container">
+            <section className="details-section">
+              <h4 className="details-section-title">Детали водителя</h4>
+              <div className="details-grid">
+                <div className="details-item">
+                  <label>Водитель:</label>
+                  <p>{selectedTrip.driver}</p>
+                </div>
+                <div className="details-item">
+                  <label>Телеграм:</label>
+                  <p>{selectedTrip.telegram}</p>
+                </div>
+              </div>
+            </section>
 
-            <button onClick={closeModal} style={{ marginTop: 10 }}>
-              Закрыть
-            </button>
+            <section className="details-section">
+              <h4 className="details-section-title">Детали рейса</h4>
+              <div className="details-grid">
+                <div className="details-item">
+                  <label>ТС:</label>
+                  <p>{selectedTrip.vehicle}</p>
+                </div>
+                <div className="details-item">
+                  <label>Номер машины:</label>
+                  <p>{selectedTrip.carNumber}</p>
+                </div>
+                <div className="details-item">
+                  <label>Маршрут:</label>
+                  <p>{selectedTrip.route}</p>
+                </div>
+                <div className="details-item">
+                  <label>Дата:</label>
+                  <p>{selectedTrip.date}</p>
+                </div>
+                <div className="details-item">
+                  <label>Статус:</label>
+                  <div className="status-badge">{selectedTrip.status}</div>
+                </div>
+                <div className="details-item">
+                  <label>Комментарий:</label>
+                  <p>{selectedTrip.comment}</p>
+                </div>
+              </div>
+            </section>
+
+            <section className="details-section">
+              <h4 className="details-section-title">Детали заказчика</h4>
+              <div className="details-grid">
+                <div className="details-item">
+                  <label>Контакты клиента:</label>
+                  <p>{selectedTrip.customerContacts}</p>
+                </div>
+                <div className="details-item">
+                  <label>Дата и время загрузки:</label>
+                  <p>{selectedTrip.loadingDateTime}</p>
+                </div>
+              </div>
+            </section>
           </div>
-        </div>
+
+          <UiTableButton
+            label="Закрыть"
+            onClick={closeModal}
+            style={{ marginTop: 24, width: "100%" }}
+          />
+        </UiModal>
       )}
     </div>
   );

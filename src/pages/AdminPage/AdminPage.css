@@ -23,7 +23,7 @@ body {
     padding: 10px 0 0 10px;
     box-sizing: border-box;
     overflow-y: auto; /* если меню высокое */
-    background-color: rgb(80, 80, 254);
+    background-color: #fff;
 }
 .admin-panel-container__right {
     margin-left: auto; /* чтобы не заходила под левую панель */
@@ -33,8 +33,8 @@ body {
     background-color: rgb(229, 242, 246);
 }
 .border-glow {
-    box-shadow: 0 0 10px hsl(var(--primary) / 0.3);
-    border: 1px solid hsl(var(--primary) / 0.5);
+    box-shadow:var(--primary);
+    border: var(--primary);
 }
 
 .admin-panel-container__left-logo {
@@ -52,14 +52,14 @@ body {
     margin: 0.2rem 0;
 }
 .admin-panel-container__left_nav {
-    margin-top: 20px;
+    margin: 20px 5px;
 }
 .admin-panel-container__left_nav-item {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 1rem;
-    margin: 10px 0 0 0px;
+    margin: 8px 0;
 }
 .admin-panel-user-role {
     display: flex;
@@ -71,16 +71,18 @@ body {
 }
 .admin-panel-user-role_descr {
     color: rgb(148, 166, 184);
+    font-size: 0.75rem;
 }
 
 .admin-panel-container__left_nav-title {
-    color: rgb(87, 221, 255);
+    color: #000;
+    font-weight: 500;
     text-align: left;
-    margin-left: 20px;
 }
 .admin-panel-container__left_nav-item svg {
     width: 1rem;
     height: 1rem;
+    margin-left: 5px;
 }
 
 .company-logo {

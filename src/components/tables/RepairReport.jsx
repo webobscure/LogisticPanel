@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { FaMap, FaPlus } from "react-icons/fa";
 import UiSelect from "../ui/atoms/select"; // путь к твоему селекту
+import UiTable from "../ui/atoms/table";
+import UiTableButton from "../ui/atoms/button";
+import UiModal from "../ui/atoms/modal";
 
 export default function RepairReport() {
   const [repairRequests, setRepairRequests] = useState([
@@ -106,15 +109,15 @@ export default function RepairReport() {
         <h1>
           <FaMap /> Заявки на ремонт
         </h1>
-        <button onClick={() => setIsAddRepairDialogOpen(true)}>
-          <FaPlus /> Добавить заявку
-        </button>
+        <UiTableButton
+          label="Добавить заявку"
+          icon={FaPlus}
+          onClick={() => setIsAddRepairDialogOpen(true)}
+        />
       </div>
 
       {/* Фильтр по статусу */}
       <div className="racestoday-filter">
-        
-
         <UiSelect
           value={repairStatusFilter}
           onChange={handleRepairFilterChange}
@@ -125,99 +128,70 @@ export default function RepairReport() {
       </div>
 
       {/* Таблица заявок */}
-      <table
-        border="1"
-        cellPadding="8"
-        style={{ marginTop: 20, width: "100%", borderCollapse: "collapse" }}
-      >
-        <thead>
-          <tr>
-            <th>Время</th>
-            <th>ТС</th>
-            <th>Номер машины</th>
-            <th>Описание</th>
-            <th>Статус</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredRepairRequests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.time}</td>
-              <td>{request.vehicle}</td>
-              <td>{request.carNumber}</td>
-              <td>{request.description}</td>
-              <td className="table-status">
-                 <UiSelect
-          value={request.status}
-          onChange={(e) =>
-                    handleRepairStatusChange(request.id, e.target.value)}
-          options={statuses}
-          placeholder="Выберите статус"
-        />
-                
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <UiTable
+        columns={[
+          { header: "Время", render: (r) => r.time },
+          { header: "ТС", render: (r) => r.vehicle },
+          { header: "Номер машины", render: (r) => r.carNumber },
+          { header: "Описание", render: (r) => r.description },
+          {
+            header: "Статус",
+            className: "table-status",
+            render: (r) => (
+              <UiSelect
+                value={r.status}
+                onChange={(val) => handleRepairStatusChange(r.id, val)}
+                options={statuses}
+                placeholder="Выберите статус"
+              />
+            ),
+          },
+        ]}
+        data={filteredRepairRequests}
+      />
 
       {/* Модальное окно */}
       {isAddRepairDialogOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Добавить новую заявку</h2>
-            <input
-              type="time"
-              placeholder="Время"
-              value={newRepairRequest.time}
-              onChange={(e) =>
-                setNewRepairRequest({
-                  ...newRepairRequest,
-                  time: e.target.value,
-                })
-              }
-            />
-            <input
-              type="text"
-              placeholder="ТС"
-              value={newRepairRequest.vehicle}
-              onChange={(e) =>
-                setNewRepairRequest({
-                  ...newRepairRequest,
-                  vehicle: e.target.value,
-                })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Номер машины"
-              value={newRepairRequest.carNumber}
-              onChange={(e) =>
-                setNewRepairRequest({
-                  ...newRepairRequest,
-                  carNumber: e.target.value,
-                })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Описание"
-              value={newRepairRequest.description}
-              onChange={(e) =>
-                setNewRepairRequest({
-                  ...newRepairRequest,
-                  description: e.target.value,
-                })
-              }
-            />
-            <div className="modal-buttons">
-              <button onClick={handleAddRepairRequest}>Сохранить</button>
-              <button onClick={() => setIsAddRepairDialogOpen(false)}>
-                Отмена
-              </button>
-            </div>
-          </div>
+         <UiModal title="Добавить новую заявку" onClose={() => setIsAddRepairDialogOpen(false)}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <input
+          type="time"
+          placeholder="Время"
+          value={newRepairRequest.time}
+          onChange={(e) =>
+            setNewRepairRequest({ ...newRepairRequest, time: e.target.value })
+          }
+        />
+        <input
+          type="text"
+          placeholder="ТС"
+          value={newRepairRequest.vehicle}
+          onChange={(e) =>
+            setNewRepairRequest({ ...newRepairRequest, vehicle: e.target.value })
+          }
+        />
+        <input
+          type="text"
+          placeholder="Номер машины"
+          value={newRepairRequest.carNumber}
+          onChange={(e) =>
+            setNewRepairRequest({ ...newRepairRequest, carNumber: e.target.value })
+          }
+        />
+        <input
+          type="text"
+          placeholder="Описание"
+          value={newRepairRequest.description}
+          onChange={(e) =>
+            setNewRepairRequest({ ...newRepairRequest, description: e.target.value })
+          }
+        />
+        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 20 }}>
+          <UiTableButton label="Сохранить" onClick={handleAddRepairRequest} />
+          <UiTableButton label="Отмена" onClick={() => setIsAddRepairDialogOpen(false)} />
         </div>
+      </div>
+    </UiModal>
       )}
 
       {/* Стили для модалки */}

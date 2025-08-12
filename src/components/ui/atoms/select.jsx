@@ -18,8 +18,7 @@ export default function UiSelect({
         onChange={(e) => onChange(e.target.value)}
         style={{
           padding: "6px 10px",
-          border: "1px solid #ccc",
-          "border-radius": "4px",
+          "border-radius": "12px",
           "font-size": "14px",
           background: "white",
           cursor: "pointer",
