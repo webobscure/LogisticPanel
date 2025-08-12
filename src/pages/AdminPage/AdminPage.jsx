@@ -6,10 +6,9 @@ import Header from "../../components/Header/Header";
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
 import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
 import { InfoItem } from "../../components/ui/molecules/InfoItem";
+import UiTableButton from "../../components/ui/atoms/button";
 
 export default function AdminPage() {
-
-  
   // ===== Линейный график =====
   const lineOptions = {
     chart: { toolbar: { show: false }, foreColor: "#000" },
@@ -89,21 +88,27 @@ export default function AdminPage() {
     fontWeight: "bold",
   };
   return (
-    <> 
+    <>
       <div className="admin-panel-container">
         <Header />
         <div className="admin-panel-container__right">
           <TopBlock>
             <TotalWorkload />
-            <InfoItem 
-              title='Месячный доход' value='1.2М' text='₽'
-              description='+12% к прошлому месяцу' 
-              iconType='income' iconColor='gold'
+            <InfoItem
+              title="Месячный доход"
+              value="1.2М"
+              text="₽"
+              description="+12% к прошлому месяцу"
+              iconType="income"
+              iconColor="gold"
             />
-            <InfoItem 
-              title='Эффективность' value='92' text='%'
-              description='Средняя по парку' 
-              iconType='efficiency' iconColor='violet'
+            <InfoItem
+              title="Эффективность"
+              value="92"
+              text="%"
+              description="Средняя по парку"
+              iconType="efficiency"
+              iconColor="violet"
             />
           </TopBlock>
           <div className="diagrams">
@@ -186,51 +191,77 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: "20px", padding: "20px", flexDirection:"column" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              padding: "20px",
+              flexDirection: "column",
+            }}
+          >
             {/* Затраты */}
-            <div
-              className="card-container"
-            >
-               <h3
-                  style={{
-                    color: "#0ff",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <FaWrench /> Затраты на ТО/Ремонт
-                </h3>
+            <div className="card-container">
+              <h3
+                style={{
+                  color: "#000",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaWrench /> Затраты на ТО/Ремонт
+              </h3>
               <div className="card-block">
-              <div className="card">
-               
-               <div style={{ fontSize: "28px", color: "#c77dff", textAlign: "center" }}>
-                 {maintenanceData.lastMonth.toLocaleString()} ₽
-               </div>
-               <div style={{ fontSize: "14px", opacity: 0.7,  textAlign: "center" }}>
-                 Последний месяц
-               </div>
-             </div>
-             <div className="card">
-               <div style={{ fontSize: "28px", color: "#c77dff",  textAlign: "center" }}>
-                 {maintenanceData.avgExpenses.toLocaleString()} ₽
-               </div>
-               <div style={{ fontSize: "14px", opacity: 0.7,  textAlign: "center" }}>
-                 Средние расходы
-               </div>
-             </div>
+                <div className="card">
+                  <div
+                    style={{
+                      fontSize: "28px",
+                      color: "#c77dff",
+                      textAlign: "center",
+                    }}
+                  >
+                    {maintenanceData.lastMonth.toLocaleString()} ₽
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      opacity: 0.7,
+                      textAlign: "center",
+                    }}
+                  >
+                    Последний месяц
+                  </div>
+                </div>
+                <div className="card">
+                  <div
+                    style={{
+                      fontSize: "28px",
+                      color: "#c77dff",
+                      textAlign: "center",
+                    }}
+                  >
+                    {maintenanceData.avgExpenses.toLocaleString()} ₽
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      opacity: 0.7,
+                      textAlign: "center",
+                    }}
+                  >
+                    Средние расходы
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* KPI блоки */}
-            <div
-             className="card-container kpi-container"
-            >
+            <div className="card-container kpi-container">
               {/* Водители */}
               <div className="card ">
                 <h3
                   style={{
-                    color: "#0ff",
+                    color: "#000",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
@@ -257,31 +288,20 @@ export default function AdminPage() {
                         {d.trips} рейсов • {d.rate.toLocaleString()} ₽/рейс
                       </div>
                     </div>
-                    <a
+                    <UiTableButton
+                      label="Telegram"
+                      icon={FaTelegramPlane}
                       href={d.telegram}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        background: "rgb(229, 242, 246)",
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        textDecoration: "none",
-                      }}
-                    >
-                      <FaTelegramPlane /> Telegram
-                    </a>
+                    />
                   </div>
                 ))}
               </div>
 
               {/* Механики */}
-              <div  className="card">
+              <div className="card">
                 <h3
                   style={{
-                    color: "#0ff",
+                    color: "#000",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
@@ -308,22 +328,11 @@ export default function AdminPage() {
                         ТО: {m.to} • Ремонты: {m.repairs} • {m.time}
                       </div>
                     </div>
-                    <a
+                    <UiTableButton
+                      label="Telegram"
+                      icon={FaTelegramPlane}
                       href={m.telegram}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        background: "rgb(229, 242, 246)",
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        textDecoration: "none",
-                      }}
-                    >
-                      <FaTelegramPlane /> Telegram
-                    </a>
+                    />
                   </div>
                 ))}
               </div>

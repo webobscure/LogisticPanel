@@ -3,7 +3,6 @@ import styled from 'styled-components';
 const TopBlockContainer = styled.div`
   display: flex;
   width: 100%;
-  gap: 1rem;
 
   /* Стили для дочерних компонентов */
   & > * {
