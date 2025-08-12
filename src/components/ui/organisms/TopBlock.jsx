@@ -1,6 +1,3 @@
-import { MonthlyIncome } from "../molecules/MonthlyIncome"
-import { TotalEfficiency } from "../molecules/TotalEfficiency"
-import { TotalWorkload } from "../molecules/TotalWorkload"
 import styled from 'styled-components';
 
 const TopBlockContainer = styled.div`
@@ -19,12 +16,6 @@ const TopBlockContainer = styled.div`
   }
 `;
 
-export const TopBlock = () => {
-  return (
-    <TopBlockContainer>
-      <TotalWorkload />
-      <MonthlyIncome />
-      <TotalEfficiency />
-    </TopBlockContainer>
-  )
-}
+export const TopBlock = ({ children }) => {
+  return <TopBlockContainer>{children}</TopBlockContainer>;
+};

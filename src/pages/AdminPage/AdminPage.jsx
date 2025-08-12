@@ -2,15 +2,10 @@ import "./AdminPage.css";
 import Chart from "react-apexcharts";
 import { FaTelegramPlane, FaWrench, FaUserCog } from "react-icons/fa";
 
-import { CardHeader } from "../../components/ui/atoms/cardHeader";
-import { CardValue } from "../../components/ui/atoms/cardValue";
-import { CardLabel } from "../../components/ui/atoms/cardLabel";
-import { Card } from "../../components/ui/atoms/Card";
 import Header from "../../components/Header/Header";
-import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
-import { MonthlyIncome } from "../../components/ui/molecules/MonthlyIncome";
-import { TotalEfficiency } from "../../components/ui/molecules/TotalEfficiency";
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
+import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
+import { InfoItem } from "../../components/ui/molecules/InfoItem";
 
 export default function AdminPage() {
 
@@ -98,7 +93,19 @@ export default function AdminPage() {
       <div className="admin-panel-container">
         <Header />
         <div className="admin-panel-container__right">
-          <TopBlock />
+          <TopBlock>
+            <TotalWorkload />
+            <InfoItem 
+              title='Месячный доход' value='1.2М' text='₽'
+              description='+12% к прошлому месяцу' 
+              iconType='income' iconColor='gold'
+            />
+            <InfoItem 
+              title='Эффективность' value='92' text='%'
+              description='Средняя по парку' 
+              iconType='efficiency' iconColor='violet'
+            />
+          </TopBlock>
           <div className="diagrams">
             {/* Линейный график */}
             <div className="diagrams-item bg-card-light">

@@ -1,4 +1,4 @@
-import { FiTrendingUp, FiDollarSign, FiActivity } from 'react-icons/fi';
+import { FiTrendingUp, FiDollarSign, FiActivity, FiAnchor, FiXOctagon, FiMap, FiTool, FiCalendar, FiCheck } from 'react-icons/fi';
 import styled from 'styled-components';
 
 // Стилизованные компоненты
@@ -34,15 +34,21 @@ const Title = styled.h3`
 const icons = {
   load: <FiTrendingUp size={20} />,
   income: <FiDollarSign size={20} />,
-  efficiency: <FiActivity size={20} />
+  efficiency: <FiActivity size={20} />,
+  activeTrips: <FiMap size={20} />,
+  based: <FiAnchor size={20} />,
+  issues: <FiXOctagon size={20} />,
+  repair: <FiTool size={20} />,
+  planTO: <FiCalendar size={20} />,
+  default: <FiCheck size={20} color='green'/>
 };
 
-export const CardHeader = ({ title = 'Заголовок', iconType, color = '#4F46E5' }) => {
+export const CardHeader = ({ title = 'Заголовок', iconType, iconColor = '#4F46E5',}) => {
   const icon = icons[iconType] || icons.load;
   
   return (
     <HeaderContainer>
-      <IconWrapper color={color}>
+      <IconWrapper color={iconColor}>
         {icon}
       </IconWrapper>
       <Title>{title}</Title>

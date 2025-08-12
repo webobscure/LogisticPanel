@@ -5,7 +5,6 @@ const Description = styled.div`
 `;
 
 export const CardDescription = ({ children, description }) => {
-  // Используем description или children (более гибкий вариант)
   const content = description || children;
   
   return <Description>{content}</Description>;

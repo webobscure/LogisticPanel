@@ -19,6 +19,8 @@ import "./LogistPage.css";
 import { FiAlertTriangle } from "react-icons/fi";
 import ErrorReport from "../../components/tables/ErrorReport/ErrorReport";
 import RacesToday from "../../components/tables/RacesToday";
+import { TopBlock } from "../../components/ui/organisms/TopBlock";
+import { InfoItem } from "../../components/ui/molecules/InfoItem";
 
 export default function LogistPage() {
   // ===== Линейный график =====
@@ -82,14 +84,29 @@ export default function LogistPage() {
     },
   ];
 
-
-
-
-
   return (
     <div className="admin-panel-container">
       <Header />
+
       <div className="admin-panel-container__right">
+        <TopBlock>
+          <InfoItem 
+            title='Активные рейсы' value='15'
+            description='Сейчас в движении' 
+            iconType='activeTrips' iconColor='green'
+          />
+          <InfoItem 
+            title='На базе' value='8'
+            description='Готовы к отправке' 
+            iconType='based' iconColor='black'
+          />
+          <InfoItem 
+            title='Проблемные' value='2'
+            description='Требуют внимания' 
+            iconType='issues' iconColor='red'
+          />
+        </TopBlock>
+
         <div className="diagrams ">
           {/* Линейный график */}
           <div className="diagrams-item bg-card-light">
