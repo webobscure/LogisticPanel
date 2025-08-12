@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import UiSelect from "../../ui/atoms/select";
 import "./PlanTO.css";
+import UiTable from "../../ui/atoms/table";
+import { FaPlus } from "react-icons/fa";
+import UiTableButton from "../../ui/atoms/button";
+import UiModal from "../../ui/atoms/modal";
 
 export default function PlanTO() {
   const [scheduledMaintenance, setScheduledMaintenance] = useState([
@@ -110,9 +114,11 @@ export default function PlanTO() {
     <div className="planto bg-card-light">
       <div className="planto-header">
         <h1>Плановое ТО</h1>
-        <button onClick={() => setIsAddMaintenanceDialogOpen(true)}>
-          Добавить ТО
-        </button>
+        <UiTableButton
+          label="Добавить ТО"
+          icon={FaPlus}
+          onClick={() => setIsAddMaintenanceDialogOpen(true)}
+        />
       </div>
 
       {/* Фильтр */}
@@ -127,50 +133,35 @@ export default function PlanTO() {
       </div>
 
       {/* Таблица */}
-      <table
-        border="1"
-        cellPadding="8"
-        style={{ marginTop: 20, width: "100%" }}
-      >
-        <thead>
-          <tr>
-            <th>ТС</th>
-            <th>Номер машины</th>
-            <th>Дата</th>
-            <th>Тип ТО</th>
-            <th>Статус</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredMaintenance.map((maintenance) => (
-            <tr key={maintenance.id}>
-              <td>{maintenance.vehicle}</td>
-              <td>{maintenance.carNumber}</td>
-              <td>{maintenance.date}</td>
-              <td>{maintenance.type}</td>
-              <td className="table-status">
-                <UiSelect
-                  value={maintenance.status}
-                  onChange={(e) =>
-                    handleMaintenanceStatusChange(
-                      maintenance.id,
-                      e.target.value
-                    )
-                  }
-                  options={statuses}
-                  placeholder="Выберите статус"
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <UiTable
+        columns={[
+          { header: "ТС", render: (m) => m.vehicle },
+          { header: "Номер машины", render: (m) => m.carNumber },
+          { header: "Дата", render: (m) => m.date },
+          { header: "Тип ТО", render: (m) => m.type },
+          {
+            header: "Статус",
+            className: "table-status",
+            render: (m) => (
+              <UiSelect
+                value={m.status}
+                onChange={(val) => handleMaintenanceStatusChange(m.id, val)}
+                options={statuses}
+                placeholder="Выберите статус"
+              />
+            ),
+          },
+        ]}
+        data={filteredMaintenance}
+      />
 
       {/* Модальное окно */}
       {isAddMaintenanceDialogOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Добавить новое ТО</h2>
+        <UiModal
+          title="Добавить новое ТО"
+          onClose={() => setIsAddMaintenanceDialogOpen(false)}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input
               type="text"
               placeholder="ТС"
@@ -214,14 +205,25 @@ export default function PlanTO() {
                 })
               }
             />
-            <div className="modal-buttons">
-              <button onClick={handleAddMaintenanceRequest}>Сохранить</button>
-              <button onClick={() => setIsAddMaintenanceDialogOpen(false)}>
-                Отмена
-              </button>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 10,
+                marginTop: 20,
+              }}
+            >
+              <UiTableButton
+                label="Сохранить"
+                onClick={handleAddMaintenanceRequest}
+              />
+              <UiTableButton
+                label="Отмена"
+                onClick={() => setIsAddMaintenanceDialogOpen(false)}
+              />
             </div>
           </div>
-        </div>
+        </UiModal>
       )}
 
       {/* Стили */}

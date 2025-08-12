@@ -1,7 +1,8 @@
 .active {
-    background-color:  hsl(var(--primary) / 0.2); /* выделение */
+    border:1px solid  var(--primary);  /* выделение */
     color: white;
     font-weight: bold;
     border-radius: 8px;
+    background-color: rgb(229, 242, 246);
   }
   

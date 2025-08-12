@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { FaCircle, FaImage, FaPhone } from "react-icons/fa";
 import { FiAlertTriangle } from "react-icons/fi";
 import "./ErrorReport.css"; // Подключаем стили
+import UiTable from "../../ui/atoms/table";
+import UiTableButton from "../../ui/atoms/button";
+import UiModal from "../../ui/atoms/modal";
 
 export default function ErrorReport() {
   const [reports, setReports] = useState([
@@ -51,7 +54,9 @@ export default function ErrorReport() {
   };
 
   const prevPhoto = () => {
-    setCurrentPhotoIndex((prev) => (prev - 1 + selectedPhotos.length) % selectedPhotos.length);
+    setCurrentPhotoIndex(
+      (prev) => (prev - 1 + selectedPhotos.length) % selectedPhotos.length
+    );
   };
 
   const closeModal = () => {
@@ -67,64 +72,57 @@ export default function ErrorReport() {
         <FiAlertTriangle /> Заявки о проблеме
       </div>
       <div className="errorreport-table">
-        <table>
-          <thead>
-            <tr>
-              <th>ФИО</th>
-              <th>Дата и время</th>
-              <th>Фотографии</th>
-              <th>Документы</th>
-              <th>Действия</th>
-              <th>Статус</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleReports.map((report) => (
-              <tr key={report.id}>
-                <td>{report.name}</td>
-                <td>{report.datetime}</td>
-                <td>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => openPhotoGallery(report.photos)}
-                  >
-                    <FaImage /> {report.photos.length} фото
-                  </button>
-                </td>
-                <td>{report.documents.join(", ")}</td>
-                <td>
-                  <a className="btn-primary" href={`tel:${report.phone}`}>
-                    <FaPhone /> Связаться
-                  </a>
-                </td>
-                <td>
+        <UiTable
+          columns={[
+            { header: "ФИО", render: (r) => r.name },
+            { header: "Дата и время", render: (r) => r.datetime },
+            {
+              header: "Фотографии",
+              render: (r) => (
+                <UiTableButton
+                  label={`${r.photos.length} фото`}
+                  onClick={() => openPhotoGallery(r.photos)}
+                  icon={FaImage}
+                />
+              ),
+            },
+            { header: "Документы", render: (r) => r.documents.join(", ") },
+            {
+              header: "Действия",
+              render: (r) => (
+                <UiTableButton
+                  label="Связаться"
+                  icon={FaPhone}
+                  href={`tel:${r.phone}`}
+                />
+              ),
+            },
+            {
+              header: "Статус",
+              render: () => (
+                <>
                   <FaCircle color="red" /> Не решено
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </>
+              ),
+            },
+          ]}
+          data={visibleReports}
+        />
       </div>
 
       {/* Модалка для фото */}
       {isModalOpen && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Фотографии</h3>
-            <img
-              src={selectedPhotos[currentPhotoIndex]}
-              alt="Фото"
-              className="modal-photo"
-            />
-            <div className="modal-controls">
-              <button onClick={prevPhoto}>Назад</button>
-              <button onClick={nextPhoto}>Вперёд</button>
-            </div>
-            <button className="modal-close" onClick={closeModal}>
-              ✖
-            </button>
+        <UiModal title="Фотографии" onClose={closeModal}>
+          <img
+            src={selectedPhotos[currentPhotoIndex]}
+            alt="Фото"
+            className="modal-photo"
+          />
+          <div className="modal-controls">
+            <UiTableButton label="Назад" onClick={prevPhoto} />
+            <UiTableButton label="Вперёд" onClick={nextPhoto} />
           </div>
-        </div>
+        </UiModal>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 :root {
   --background: 225 15% 6%;
-  --primary: 192 100% 67%;
+  --primary:#4a90e2;
   --border: 225 15% 15%;
   --border-light: 210 40% 95%;
   --gradient-primary: linear-gradient(135deg, hsl(192 100% 67%), hsl(270 100% 80%));
@@ -13,6 +13,13 @@ body {
   align-items: center;    
   background: #fff;
   color: #000;
+}
+h1 {
+  font-weight: 600;
+    font-size: 1.4rem;
+    color: #222;
+    margin-bottom: 15px;
+    user-select: none;
 }
 #root {
   text-align: center;

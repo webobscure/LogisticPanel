@@ -125,7 +125,7 @@ export default function LogistPage() {
           <div className="card-container  ">
             <h3
               style={{
-                color: "#0ff",
+                color: "#000",
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",

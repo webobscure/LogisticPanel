@@ -3,6 +3,7 @@ import Header from "../../components/Header/Header";
 import { FaSearch, FaUser } from "react-icons/fa";
 import "./UserPage.css";
 import UiSelect from "../../components/ui/atoms/select";
+import UiTable from "../../components/ui/atoms/table";
 
 export default function UserPage() {
   const [users, setUsers] = useState([
@@ -172,14 +173,18 @@ export default function UserPage() {
                 type="text"
                 placeholder="Имя"
                 value={searchFilters.firstName}
-                onChange={(e) => handleFilterChange("firstName", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("firstName", e.target.value)
+                }
                 className="filter-input"
               />
               <input
                 type="text"
                 placeholder="Отчество"
                 value={searchFilters.middleName}
-                onChange={(e) => handleFilterChange("middleName", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("middleName", e.target.value)
+                }
                 className="filter-input"
               />
               <input
@@ -193,7 +198,9 @@ export default function UserPage() {
                 type="text"
                 placeholder="Номер машины"
                 value={searchFilters.carNumber}
-                onChange={(e) => handleFilterChange("carNumber", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("carNumber", e.target.value)
+                }
                 className="filter-input"
               />
 
@@ -224,61 +231,64 @@ export default function UserPage() {
               />
               <span className="title-text">Пользователи ({users.length})</span>
             </div>
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>ФИО</th>
-                  <th>ТС / Номер машины</th>
-                  <th>Роль</th>
-                  <th>Верификация</th>
-                  <th>Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className={user.banned ? "banned-row" : ""}>
-                    <td>{`${user.lastName} ${user.firstName} ${user.middleName}`}</td>
-                    <td>
-                      {user.vehicle || "-"}
+            <UiTable
+              columns={[
+                {
+                  header: "ФИО",
+                  render: (u) => `${u.lastName} ${u.firstName} ${u.middleName}`,
+                },
+                {
+                  header: "ТС / Номер машины",
+                  render: (u) => (
+                    <>
+                      {u.vehicle || "-"}
                       <br />
-                      {user.carNumber || "-"}
-                    </td>
-                    <td>
-                      <UiSelect
-                        options={userTypes}
-                        value={user.userType}
-                        onChange={(val) => handleRoleChange(user.id, val)}
-                        placeholder="Выберите роль"
-                        className="role-select"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={user.verified}
-                        onChange={(e) =>
-                          handleVerificationToggle(user.id, e.target.checked)
-                        }
-                        className="verification-checkbox"
-                      />
-                    </td>
-                    <td className="action-cell">
+                      {u.carNumber || "-"}
+                    </>
+                  ),
+                },
+                {
+                  header: "Роль",
+                  render: (u) => (
+                    <UiSelect
+                      options={userTypes}
+                      value={u.userType}
+                      onChange={(val) => handleRoleChange(u.id, val)}
+                      placeholder="Выберите роль"
+                    />
+                  ),
+                },
+                {
+                  header: "Верификация",
+                  render: (u) => (
+                    <input
+                      type="checkbox"
+                      checked={u.verified}
+                      onChange={(e) =>
+                        handleVerificationToggle(u.id, e.target.checked)
+                      }
+                    />
+                  ),
+                },
+                {
+                  header: "Действия",
+                  render: (u) => (
+                    <>
                       <label className="switch">
                         <input
                           type="checkbox"
-                          checked={user.banned}
-                          onChange={() => handleBanToggle(user.id)}
+                          checked={u.banned}
+                          onChange={() => handleBanToggle(u.id)}
                         />
                         <span className="slider" />
                       </label>
-                      <span className="action-label">
-                        {user.banned ? "Верифицировать" : "Забанить"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <span>{u.banned ? "Верифицировать" : "Забанить"}</span>
+                    </>
+                  ),
+                },
+              ]}
+              data={filteredUsers}
+            />
           </div>
         </div>
       </div>
