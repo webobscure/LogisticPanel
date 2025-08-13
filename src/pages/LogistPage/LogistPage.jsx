@@ -1,26 +1,11 @@
-import React, { useState } from "react";
-import Header from "../../components/Header/Header";
 import Chart from "react-apexcharts";
-import {
-  FaTelegramPlane,
-  FaWrench,
-  FaUserCog,
-  FaTimes,
-  FaTimesCircle,
-  FaClock,
-  FaMapMarked,
-  FaPlus,
-  FaMap,
-  FaPhone,
-  FaCircle,
-  FaImage,
-} from "react-icons/fa";
-import "./LogistPage.css";
-import { FiAlertTriangle } from "react-icons/fi";
+import { FaClock } from "react-icons/fa";
+
 import ErrorReport from "../../components/tables/ErrorReport/ErrorReport";
 import RacesToday from "../../components/tables/RacesToday";
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
 import { InfoItem } from "../../components/ui/molecules/InfoItem";
+import NavPanel from "../../components/ui/organisms/NavPanel";
 
 export default function LogistPage() {
   // ===== Линейный график =====
@@ -86,7 +71,7 @@ export default function LogistPage() {
 
   return (
     <div className="admin-panel-container">
-      <Header />
+      <NavPanel />
 
       <div className="admin-panel-container__right">
         <TopBlock>

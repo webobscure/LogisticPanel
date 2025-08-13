@@ -2,11 +2,11 @@ import "./AdminPage.css";
 import Chart from "react-apexcharts";
 import { FaTelegramPlane, FaWrench, FaUserCog } from "react-icons/fa";
 
-import Header from "../../components/Header/Header";
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
 import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
 import { InfoItem } from "../../components/ui/molecules/InfoItem";
 import UiTableButton from "../../components/ui/atoms/button";
+import NavPanel from "../../components/ui/organisms/NavPanel";
 
 export default function AdminPage() {
   // ===== Линейный график =====
@@ -90,7 +90,9 @@ export default function AdminPage() {
   return (
     <>
       <div className="admin-panel-container">
-        <Header />
+        {/* <Header /> */}
+        <NavPanel />
+        
         <div className="admin-panel-container__right">
           <TopBlock>
             <TotalWorkload />

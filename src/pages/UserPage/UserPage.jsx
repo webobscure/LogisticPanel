@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import Header from "../../components/Header/Header";
+import { useState } from "react";
 import { FaSearch, FaUser } from "react-icons/fa";
+
 import "./UserPage.css";
+
 import UiSelect from "../../components/ui/atoms/select";
 import UiTable from "../../components/ui/atoms/table";
+import NavPanel from "../../components/ui/organisms/NavPanel";
 
 export default function UserPage() {
   const [users, setUsers] = useState([
@@ -153,7 +155,8 @@ export default function UserPage() {
 
   return (
     <div className="admin-panel-container">
-      <Header />
+      <NavPanel />
+      
       <div className="admin-panel-container__right">
         <div className="users">
           {/* Форма поиска */}

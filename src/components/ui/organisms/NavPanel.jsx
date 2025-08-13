@@ -1,8 +1,7 @@
-import React from 'react'
-import { NavLink } from 'react-router'
-import './Header.css'
+import { NavLink } from 'react-router';
+import './NavPanel.css';
 
-export default function Header() {
+export default function NavPanel() {
   return (
     <div className="admin-panel-container__left border-glow">
           <div className="admin-panel-container__left-logo">

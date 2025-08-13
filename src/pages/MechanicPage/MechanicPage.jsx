@@ -1,14 +1,15 @@
-import Header from '../../components/Header/Header'
 import ErrorReport from '../../components/tables/ErrorReport/ErrorReport'
 import RepairReport from '../../components/tables/RepairReport'
 import PlanTO from '../../components/tables/PlanTO/PlanTO'
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
 import { InfoItem } from '../../components/ui/molecules/InfoItem';
+import NavPanel from '../../components/ui/organisms/NavPanel';
 
 export default function MechanicPage() {
   return (
     <div className="admin-panel-container">
-      <Header />
+      <NavPanel />
+      
       <div className="admin-panel-container__right">
         <TopBlock>
           <InfoItem 
