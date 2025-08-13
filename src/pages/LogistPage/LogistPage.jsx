@@ -6,6 +6,7 @@ import RacesToday from "../../components/tables/RacesToday";
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
 import { InfoItem } from "../../components/ui/molecules/InfoItem";
 import NavPanel from "../../components/ui/organisms/NavPanel";
+import { Header } from "../../components/ui/molecules/Header";
 
 export default function LogistPage() {
   // ===== Линейный график =====
@@ -74,6 +75,8 @@ export default function LogistPage() {
       <NavPanel />
 
       <div className="admin-panel-container__right">
+        <Header title="Панель логиста" userName="Павел Павлов" />
+
         <TopBlock>
           <InfoItem 
             title='Активные рейсы' value='15'

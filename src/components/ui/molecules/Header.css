@@ -1,0 +1,65 @@
+.header {
+    display: flex;
+    padding: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h1 {
+  background: linear-gradient(90deg, 
+            hsl(192 100% 67%) 0%, 
+            hsl(270 100% 80%) 50%, 
+            hsl(300 100% 70%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header_user-name {
+    position: relative;
+    padding-left: 2rem; /* Оставляем место для кружка */
+}
+
+.header_user-name::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: linear-gradient(90deg, 
+              hsl(192 100% 67%) 0%, 
+              hsl(270 100% 80%) 50%, 
+              hsl(300 100% 70%) 100%);
+    background-size: 200% 200%;  /* Для анимации градиента */
+    animation: 
+        blink 2.5s ease-in-out infinite,
+        gradient-pulse 4s ease infinite alternate;
+    box-shadow: 0 0 12px rgba(208, 153, 255, 0.6); /* Фиолетовое свечение */
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.4; }
+}
+
+@keyframes gradient-pulse {
+    0% { 
+        background-position: 0% 50%; 
+        box-shadow: 0 0 12px rgba(0, 231, 255, 0.6); /* Голубое свечение */
+    }
+    50% { 
+        background-position: 100% 50%; 
+        box-shadow: 0 0 16px rgba(208, 153, 255, 0.8); /* Розовое свечение */
+    }
+    100% { 
+        background-position: 0% 50%; 
+        box-shadow: 0 0 12px rgba(255, 102, 255, 0.6); /* Пурпурное свечение */
+    }
+}

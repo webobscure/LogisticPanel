@@ -4,6 +4,7 @@ import PlanTO from '../../components/tables/PlanTO/PlanTO'
 import { TopBlock } from "../../components/ui/organisms/TopBlock";
 import { InfoItem } from '../../components/ui/molecules/InfoItem';
 import NavPanel from '../../components/ui/organisms/NavPanel';
+import { Header } from '../../components/ui/molecules/Header';
 
 export default function MechanicPage() {
   return (
@@ -11,6 +12,8 @@ export default function MechanicPage() {
       <NavPanel />
       
       <div className="admin-panel-container__right">
+        <Header title="Панель механика" userName="Петр Петров" />
+
         <TopBlock>
           <InfoItem 
             title='Активные ремонты' value='2'

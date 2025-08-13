@@ -6,6 +6,7 @@ import "./UserPage.css";
 import UiSelect from "../../components/ui/atoms/select";
 import UiTable from "../../components/ui/atoms/table";
 import NavPanel from "../../components/ui/organisms/NavPanel";
+import { Header } from "../../components/ui/molecules/Header";
 
 export default function UserPage() {
   const [users, setUsers] = useState([
@@ -158,6 +159,8 @@ export default function UserPage() {
       <NavPanel />
       
       <div className="admin-panel-container__right">
+        <Header title="Управление пользователями" userName="Кирилл Кириллов" />
+
         <div className="users">
           {/* Форма поиска */}
           <div className="filter bg-card-light">

@@ -7,6 +7,7 @@ import { TotalWorkload } from "../../components/ui/molecules/TotalWorkload";
 import { InfoItem } from "../../components/ui/molecules/InfoItem";
 import UiTableButton from "../../components/ui/atoms/button";
 import NavPanel from "../../components/ui/organisms/NavPanel";
+import { Header } from "../../components/ui/molecules/Header";
 
 export default function AdminPage() {
   // ===== Линейный график =====
@@ -90,10 +91,11 @@ export default function AdminPage() {
   return (
     <>
       <div className="admin-panel-container">
-        {/* <Header /> */}
         <NavPanel />
-        
+
         <div className="admin-panel-container__right">
+          <Header title="Панель руководителя" userName="Сергей Сергеев" />
+
           <TopBlock>
             <TotalWorkload />
             <InfoItem
