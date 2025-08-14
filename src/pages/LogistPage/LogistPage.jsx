@@ -1,6 +1,6 @@
 import Chart from "react-apexcharts";
 import { FaClock } from "react-icons/fa";
-
+import './LogistPage.css'
 import ErrorReport from "../../components/tables/ErrorReport/ErrorReport";
 import RacesToday from "../../components/tables/RacesToday";
 import { TopBlock } from "../../components/ui/organisms/TopBlock";

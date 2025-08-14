@@ -12,8 +12,8 @@ function App() {
         <p className="greetings-descr">
           Добро пожаловать в административную панель управления автопарком
         </p>
-        <Link to="/admin">
-          <button className='greetings-button'>Перейти в админ панель</button>
+        <Link to="/auth">
+          <button className='greetings-button'>Войти/Зарегистрироваться</button>
         </Link>
       </div>
     </>

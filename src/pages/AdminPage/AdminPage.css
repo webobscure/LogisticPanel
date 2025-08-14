@@ -114,7 +114,7 @@ body {
     justify-content: space-between;
 }
 .diagrams-item {
-    width: 46.5%;
+    width: calc(50% - 60px);
     border-radius: 10px;
     margin-bottom: 20px;
 }
