@@ -220,7 +220,8 @@ export default function AdminPage() {
                   <div
                     style={{
                       fontSize: "28px",
-                      color: "#c77dff",
+                      fontWeight: 'bold',
+                      color: "#1c1d59ff",
                       textAlign: "center",
                     }}
                   >
@@ -240,7 +241,8 @@ export default function AdminPage() {
                   <div
                     style={{
                       fontSize: "28px",
-                      color: "#c77dff",
+                      fontWeight: 'bold',
+                      color: "#1c1d59ff",
                       textAlign: "center",
                     }}
                   >
@@ -260,6 +262,17 @@ export default function AdminPage() {
             </div>
 
             {/* KPI блоки */}
+            <div className="card-container">
+              <h3
+                style={{
+                  color: "#000",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaUserCog /> KPI сотрудников
+              </h3>
             <div className="card-container kpi-container">
               {/* Водители */}
               <div className="card ">
@@ -271,7 +284,7 @@ export default function AdminPage() {
                     gap: "8px",
                   }}
                 >
-                  <FaUserCog /> KPI водителей
+                  <FaUserCog /> Водители
                 </h3>
                 {drivers.map((d, i) => (
                   <div
@@ -311,7 +324,7 @@ export default function AdminPage() {
                     gap: "8px",
                   }}
                 >
-                  <FaWrench /> KPI механиков
+                  <FaWrench /> Механики
                 </h3>
                 {mechanics.map((m, i) => (
                   <div
@@ -340,6 +353,8 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
+              
+            </div>
             </div>
           </div>
         </div>
