@@ -167,3 +167,8 @@ body {
 .card div {
     text-align: left;
 }
+.income-card__km,
+.income-card__income {
+    font-size: large;
+    font-weight: bold;
+}

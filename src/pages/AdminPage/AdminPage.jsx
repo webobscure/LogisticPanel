@@ -150,8 +150,8 @@ export default function AdminPage() {
             </div>
 
             {/* Карточки с данными */}
-            <div className="diagrams-item  bg-card-light">
-              <h3 style={titleStyle}>Доходность по ТС</h3>
+            <section className="diagrams-item bg-card-light">
+              <h3>Доходность по ТС</h3>
               <div
                 style={{
                   display: "flex",
@@ -164,36 +164,46 @@ export default function AdminPage() {
                     key={item.id}
                     style={{
                       padding: "15px",
-                      display: "flex",
-                      justifyContent: "space-between",
                       borderRadius: "15px",
                       margin: "10px",
                     }}
-                    className=" bg-card-light"
+                    className="bg-card-light"
                   >
-                    <div className="diagrams-item__table">
-                      <strong>{item.id}</strong>
-                      <div className="diagrams-item__table-block">
-                        <div className="flex-col">
-                          Пробег:
-                          <br /> {item.km} км
-                        </div>
-                        <div className="flex-col">
-                          Доход:
-                          <br /> {item.income.toLocaleString()} ₽
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      style={{ alignSelf: "baseline", color: "#00E5FF" }}
-                      className="diagrams-item__table-rate"
+                    {/* Первая строка: ID и тариф */}
+                    <div 
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "8px"
+                      }}
                     >
-                      60 ₽/км
+                      <strong>{item.id}</strong>
+                      <span style={{ color: "#00E5FF" }}>60 ₽/км</span>
+                    </div>
+
+                    {/* Вторая и третья строки в общем контейнере */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      {/* Левый блок (пробег) */}
+                      <div style={{ textAlign: "left" }}>
+                        <div>Пробег:</div>
+                        <div className="income-card__km">{item.km} км</div>
+                      </div>
+
+                      {/* Правый блок (доход) */}
+                      <div style={{ textAlign: "left", marginLeft: "auto" }}>
+                        <div>Доход:</div>
+                        <div className="income-card__income">{item.income.toLocaleString()} ₽</div>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           </div>
           <div
             style={{
