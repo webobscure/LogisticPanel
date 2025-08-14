@@ -9,45 +9,48 @@ import MechanicPage from "./pages/MechanicPage/MechanicPage.jsx";
 import LogistPage from "./pages/LogistPage/LogistPage.jsx";
 import AuthPage from "./pages/FormPage/FormPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { UserProvider } from "./components/UserContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route index element={<AuthPage />} />
-        <Route
-          path="admin"
-          element={
-            <ProtectedRoute>
-              <AdminPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="logist"
-          element={
-            <ProtectedRoute>
-              <LogistPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="mechanic"
-          element={
-            <ProtectedRoute>
-              <MechanicPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="user"
-          element={
-            <ProtectedRoute>
-              <UserPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route index element={<AuthPage />} />
+          <Route
+            path="admin"
+            element={
+              <ProtectedRoute>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="logist"
+            element={
+              <ProtectedRoute>
+                <LogistPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="mechanic"
+            element={
+              <ProtectedRoute>
+                <MechanicPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="user"
+            element={
+              <ProtectedRoute>
+                <UserPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </UserProvider>
     </BrowserRouter>
   </StrictMode>
 );

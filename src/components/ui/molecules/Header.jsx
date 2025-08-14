@@ -1,26 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { fetchCurrentUser } from "../../api";
+import React from "react";
+import { useUser } from "../../UserContext";
 import "./Header.css";
 
 export const Header = ({ title = "Панель управления" }) => {
-  const [userName, setUserName] = useState("Загружается...");
-
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const user = await fetchCurrentUser();
-        setUserName(`${user.name} ${user.surname}`);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getUser();
-  }, []);
+  const { user } = useUser();
 
   return (
     <section className="header">
       <h1>{title}</h1>
-      <span className="header_user-name">{userName}</span>
+      <span className="header_user-name">
+        {user?.fullName || "Загружается..."}
+      </span>
     </section>
   );
 };
