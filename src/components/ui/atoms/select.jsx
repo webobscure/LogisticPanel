@@ -1,5 +1,6 @@
 import React from "react";
 import "../ui.css";
+
 export default function UiSelect({
   value,
   onChange,
@@ -10,18 +11,21 @@ export default function UiSelect({
   title
 }) {
   return (
-    <div className="filter-container">
+    <div className="filter-container" style={{ flex: "1 1 200px", minWidth: "150px" }}>
       {title && <h1>{title}</h1>}
       <select
         className={`ui-select ${className}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
-          padding: "6px 10px",
-          "border-radius": "12px",
-          "font-size": "14px",
+          width: "100%",          // растягиваем на всю ширину контейнера
+          padding: "10px 12px",   // одинаковый паддинг как у input
+          borderRadius: "6px",    // радиус как у input
+          fontSize: "0.95rem",    // размер шрифта как у input
+          border: "1.5px solid #ddd",
           background: "white",
           cursor: "pointer",
+          boxSizing: "border-box",
           ...style,
         }}
       >

@@ -94,7 +94,7 @@ export default function AdminPage() {
         <NavPanel />
 
         <div className="admin-panel-container__right">
-          <Header title="Панель руководителя" userName="Сергей Сергеев" />
+          <Header title="Панель руководителя" />
 
           <TopBlock>
             <TotalWorkload />

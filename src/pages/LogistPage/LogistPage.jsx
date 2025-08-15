@@ -75,7 +75,7 @@ export default function LogistPage() {
       <NavPanel />
 
       <div className="admin-panel-container__right">
-        <Header title="Панель логиста" userName="Павел Павлов" />
+        <Header title="Панель логиста"  />
 
         <TopBlock>
           <InfoItem 

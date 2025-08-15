@@ -1,45 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaCircle, FaImage, FaPhone } from "react-icons/fa";
 import { FiAlertTriangle } from "react-icons/fi";
-import "./ErrorReport.css"; // Подключаем стили
 import UiTable from "../../ui/atoms/table";
 import UiTableButton from "../../ui/atoms/button";
 import UiModal from "../../ui/atoms/modal";
 
-export default function ErrorReport() {
-  const [reports, setReports] = useState([
-    {
-      id: 1,
-      name: "Иванов Иван Иванович",
-      datetime: "2024-01-15 14:30",
-      photos: ["photo1.jpg", "photo2.jpg"],
-      documents: ["report.pdf"],
-      resolved: false,
-      phone: "+79998887766",
-    },
-    {
-      id: 2,
-      name: "Петров Петр Петрович",
-      datetime: "2024-01-15 16:45",
-      photos: ["incident.jpg"],
-      documents: ["insurance.docx", "statement.pdf"],
-      resolved: false,
-      phone: "+79997776655",
-    },
-    {
-      id: 3,
-      name: "Сидоров Сидор Сидорович",
-      datetime: "2024-01-14 10:20",
-      photos: [],
-      documents: ["maintenance.pdf"],
-      resolved: true,
-      phone: "+79996665544",
-    },
-  ]);
+const API_URL = "http://91.197.97.68:33333/api/v1";
 
+export default function ErrorReport() {
+  const [reports, setReports] = useState([]);
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("accessToken");
+        if (!token) throw new Error("Нет токена");
+
+        const res = await fetch(`${API_URL}/report/all`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Ошибка ${res.status}: ${text}`);
+        }
+
+        const data = await res.json();
+        setReports(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, []);
 
   const openPhotoGallery = (photos) => {
     if (photos.length > 0) {
@@ -49,20 +55,19 @@ export default function ErrorReport() {
     }
   };
 
-  const nextPhoto = () => {
+  const nextPhoto = () =>
     setCurrentPhotoIndex((prev) => (prev + 1) % selectedPhotos.length);
-  };
-
-  const prevPhoto = () => {
+  const prevPhoto = () =>
     setCurrentPhotoIndex(
       (prev) => (prev - 1 + selectedPhotos.length) % selectedPhotos.length
     );
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedPhotos([]);
   };
+
+  if (loading) return <p>Загрузка...</p>;
+  if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
 
   const visibleReports = reports.filter((report) => !report.resolved);
 
@@ -71,46 +76,51 @@ export default function ErrorReport() {
       <div className="errorreport-title">
         <FiAlertTriangle /> Заявки о проблеме
       </div>
+
       <div className="errorreport-table">
-        <UiTable
-          columns={[
-            { header: "ФИО", render: (r) => r.name },
-            { header: "Дата и время", render: (r) => r.datetime },
-            {
-              header: "Фотографии",
-              render: (r) => (
-                <UiTableButton
-                  label={`${r.photos.length} фото`}
-                  onClick={() => openPhotoGallery(r.photos)}
-                  icon={FaImage}
-                />
-              ),
-            },
-            { header: "Документы", render: (r) => r.documents.join(", ") },
-            {
-              header: "Действия",
-              render: (r) => (
-                <UiTableButton
-                  label="Связаться"
-                  icon={FaPhone}
-                  href={`tel:${r.phone}`}
-                />
-              ),
-            },
-            {
-              header: "Статус",
-              render: () => (
-                <>
-                  <FaCircle color="red" /> Не решено
-                </>
-              ),
-            },
-          ]}
-          data={visibleReports}
-        />
+        {visibleReports.length === 0 ? (
+          <p>Нет новых заявок о проблемах</p>
+        ) : (
+          <UiTable
+            columns={[
+              { header: "ФИО", render: (r) => r.name },
+              { header: "Дата и время", render: (r) => r.datetime },
+              {
+                header: "Фотографии",
+                render: (r) => (
+                  <UiTableButton
+                    label={`${r.photos.length} фото`}
+                    onClick={() => openPhotoGallery(r.photos)}
+                    icon={FaImage}
+                  />
+                ),
+              },
+              { header: "Документы", render: (r) => r.documents.join(", ") },
+              {
+                header: "Действия",
+                render: (r) => (
+                  <UiTableButton
+                    label="Связаться"
+                    icon={FaPhone}
+                    href={`tel:${r.phone}`}
+                  />
+                ),
+              },
+              {
+                header: "Статус",
+                render: (r) => (
+                  <>
+                    <FaCircle color={r.resolved ? "green" : "red"} />{" "}
+                    {r.resolved ? "Решено" : "Не решено"}
+                  </>
+                ),
+              },
+            ]}
+            data={visibleReports}
+          />
+        )}
       </div>
 
-      {/* Модалка для фото */}
       {isModalOpen && (
         <UiModal title="Фотографии" onClose={closeModal}>
           <img

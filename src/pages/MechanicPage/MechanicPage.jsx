@@ -12,7 +12,7 @@ export default function MechanicPage() {
       <NavPanel />
       
       <div className="admin-panel-container__right">
-        <Header title="Панель механика" userName="Петр Петров" />
+        <Header title="Панель механика"  />
 
         <TopBlock>
           <InfoItem 

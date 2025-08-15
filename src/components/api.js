@@ -8,6 +8,7 @@ export const fetchCurrentUser = async () => {
   
     if (!res.ok) throw new Error("Не удалось получить данные пользователя");
     const data = await res.json();
+    localStorage.setItem("currentUser", data.id)
     return data; // ожидаем, что data содержит { name, surname, ... }
   };
   

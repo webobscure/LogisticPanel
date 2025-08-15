@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaSearch, FaUser } from "react-icons/fa";
 
 import "./UserPage.css";
@@ -9,64 +9,12 @@ import NavPanel from "../../components/ui/organisms/NavPanel";
 import { Header } from "../../components/ui/molecules/Header";
 
 export default function UserPage() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      firstName: "Иван",
-      lastName: "Иванов",
-      middleName: "Иванович",
-      vehicle: "ТС-001",
-      carNumber: "А123БВ",
-      userType: "водитель",
-      verified: true,
-      banned: false,
-    },
-    {
-      id: 2,
-      firstName: "Петр",
-      lastName: "Петров",
-      middleName: "Петрович",
-      vehicle: "ТС-002",
-      carNumber: "В456ГД",
-      userType: "водитель",
-      verified: true,
-      banned: false,
-    },
-    {
-      id: 3,
-      firstName: "Алексей",
-      lastName: "Смирнов",
-      middleName: "Александрович",
-      vehicle: null,
-      carNumber: null,
-      userType: "механик",
-      verified: true,
-      banned: false,
-    },
-    {
-      id: 4,
-      firstName: "Мария",
-      lastName: "Козлова",
-      middleName: "Сергеевна",
-      vehicle: null,
-      carNumber: null,
-      userType: "логист",
-      verified: false,
-      banned: false,
-    },
-    {
-      id: 5,
-      firstName: "Дмитрий",
-      lastName: "Сидоров",
-      middleName: "Владимирович",
-      vehicle: null,
-      carNumber: null,
-      userType: "руководитель",
-      verified: true,
-      banned: false,
-    },
-  ]);
+const API_URL = "http://91.197.97.68:33333/api/v1";
 
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
     firstName: "",
     lastName: "",
@@ -90,6 +38,56 @@ export default function UserPage() {
     { value: "false", label: "Не верифицирован" },
   ];
 
+  // --- Загрузка всех пользователей с API ---
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("accessToken");
+        if (!token) throw new Error("Нет токена");
+
+        const res = await fetch(`${API_URL}/user/all`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Ошибка ${res.status}: ${text}`);
+        }
+
+        const data = await res.json();
+
+        const formatted = data.map(u => ({
+          id: u.id,
+          firstName: u.name || "",
+          lastName: u.surname || "",
+          middleName: u.patronymic || "",
+          vehicle: u.vehicles?.[0]?.brand || null,
+          carNumber: u.vehicles?.[0]?.state_number || null,
+          userType: u.roles?.[0] || "Не назначен",
+          verified: u.is_verified,
+          banned: u.is_banned,
+        }));
+        
+
+        setUsers(formatted);
+        setFilteredUsers(formatted);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // --- Фильтр пользователей ---
   const filterUsers = (usersList, filters) => {
     return usersList.filter((user) => {
       if (!user) return false;
@@ -117,8 +115,6 @@ export default function UserPage() {
       );
     });
   };
-
-  const [filteredUsers, setFilteredUsers] = useState(users);
 
   const handleFilterChange = (field, value) => {
     const newFilters = { ...searchFilters, [field]: value };
@@ -157,9 +153,9 @@ export default function UserPage() {
   return (
     <div className="admin-panel-container">
       <NavPanel />
-      
+
       <div className="admin-panel-container__right">
-        <Header title="Управление пользователями" userName="Кирилл Кириллов" />
+        <Header title="Управление пользователями" />
 
         <div className="users">
           {/* Форма поиска */}
@@ -167,7 +163,7 @@ export default function UserPage() {
             <div className="filter-title">
               <FaSearch /> Поиск пользователей
             </div>
-            <div className="filter-form">
+            <div className="filter-form user-form">
               <input
                 type="text"
                 placeholder="Фамилия"
@@ -228,74 +224,86 @@ export default function UserPage() {
             </div>
           </div>
 
+          {/* Статусы загрузки / ошибки */}
+          {loading && <p>Загрузка пользователей...</p>}
+          {error && <p style={{ color: "red" }}>Ошибка: {error}</p>}
+          {!loading && filteredUsers.length === 0 && (
+            <p>Пользователи не найдены.</p>
+          )}
+
           {/* Таблица пользователей */}
-          <div className="table-users bg-card-light">
-            <div className="users-title">
-              <FaUser
-                size={24}
-                style={{ marginRight: 8, verticalAlign: "middle" }}
+          {!loading && filteredUsers.length > 0 && (
+            <div className="table-users bg-card-light">
+              <div className="users-title">
+                <FaUser
+                  size={24}
+                  style={{ marginRight: 8, verticalAlign: "middle" }}
+                />
+                <span className="title-text">
+                  Пользователи ({filteredUsers.length})
+                </span>
+              </div>
+              <UiTable
+                columns={[
+                  {
+                    header: "ФИО",
+                    render: (u) =>
+                      `${u.lastName} ${u.firstName} ${u.middleName}`,
+                  },
+                  {
+                    header: "ТС / Номер машины",
+                    render: (u) => (
+                      <>
+                        {u.vehicle || "-"}
+                        <br />
+                        {u.carNumber || "-"}
+                      </>
+                    ),
+                  },
+                  {
+                    header: "Роль",
+                    render: (u) => (
+                      <UiSelect
+                        options={userTypes}
+                        value={u.userType}
+                        onChange={(val) => handleRoleChange(u.id, val)}
+                        placeholder="Выберите роль"
+                      />
+                    ),
+                  },
+                  {
+                    header: "Верификация",
+                    render: (u) => (
+                      <input
+                        type="checkbox"
+                        checked={u.verified}
+                        onChange={(e) =>
+                          handleVerificationToggle(u.id, e.target.checked)
+                        }
+                      />
+                    ),
+                  },
+                  {
+                    header: "Действия",
+                    render: (u) => (
+                      <>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={u.banned}
+                            onChange={() => handleBanToggle(u.id)}
+                          />
+                          <span className="slider" />
+                        </label>
+                        <span>{u.banned ? "Верифицировать" : "Забанить"}</span>
+                      </>
+                    ),
+                  },
+                ]}
+                data={filteredUsers}
               />
-              <span className="title-text">Пользователи ({users.length})</span>
             </div>
-            <UiTable
-              columns={[
-                {
-                  header: "ФИО",
-                  render: (u) => `${u.lastName} ${u.firstName} ${u.middleName}`,
-                },
-                {
-                  header: "ТС / Номер машины",
-                  render: (u) => (
-                    <>
-                      {u.vehicle || "-"}
-                      <br />
-                      {u.carNumber || "-"}
-                    </>
-                  ),
-                },
-                {
-                  header: "Роль",
-                  render: (u) => (
-                    <UiSelect
-                      options={userTypes}
-                      value={u.userType}
-                      onChange={(val) => handleRoleChange(u.id, val)}
-                      placeholder="Выберите роль"
-                    />
-                  ),
-                },
-                {
-                  header: "Верификация",
-                  render: (u) => (
-                    <input
-                      type="checkbox"
-                      checked={u.verified}
-                      onChange={(e) =>
-                        handleVerificationToggle(u.id, e.target.checked)
-                      }
-                    />
-                  ),
-                },
-                {
-                  header: "Действия",
-                  render: (u) => (
-                    <>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={u.banned}
-                          onChange={() => handleBanToggle(u.id)}
-                        />
-                        <span className="slider" />
-                      </label>
-                      <span>{u.banned ? "Верифицировать" : "Забанить"}</span>
-                    </>
-                  ),
-                },
-              ]}
-              data={filteredUsers}
-            />
-          </div>
+          )}
         </div>
       </div>
     </div>

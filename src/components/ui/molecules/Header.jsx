@@ -9,7 +9,7 @@ export const Header = ({ title = "Панель управления" }) => {
     <section className="header">
       <h1>{title}</h1>
       <span className="header_user-name">
-        {user?.fullName || "Загружается..."}
+        {user?.fullName }
       </span>
     </section>
   );

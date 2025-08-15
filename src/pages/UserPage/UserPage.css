@@ -27,12 +27,15 @@
 /* Форма фильтра */
 .filter-form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 382px));
+  grid-template-columns: repeat(4, minmax(0px, 2fr));
   gap: 16px;
   margin-bottom: 20px;
   user-select: none;
-  justify-content: start; /* выравнивание по левому краю, можно center */
-  max-width: calc((420px + 16px) * 4 - 16px); /* максимум ширина для 4 колонок */
+  justify-content: start; 
+  max-width: 100%; 
+}
+.filter-form .ui-select {
+  max-width: 100%;
 }
 .filter-input,
 .filter-select {
@@ -42,6 +45,10 @@
   font-size: 0.95rem;
   background-color: #fff;
   box-sizing: border-box;
+}
+.filter-form .filter-container .ui-select {
+  min-width: unset; /* убираем фиксированное ограничение */
+  width: 100%; /* растягиваем на всю ширину контейнера */
 }
 .filter-input:focus,
 .filter-select:focus {
@@ -76,3 +83,24 @@
     flex: 1 1 100%;
   }
 }
+/* Для планшетов — 2 колонки */
+@media (max-width: 768px) {
+  .filter-input,
+  .filter-select {
+    flex: 1 1 calc(50% - 10px);
+  }
+  }
+
+/* Адаптив */
+@media (max-width: 425px) {
+  .filter-form {
+      flex-direction: column;
+  }
+  .filter-input,
+  .filter-select {
+      flex: 1 1 100%;
+  }
+}
+
+
+

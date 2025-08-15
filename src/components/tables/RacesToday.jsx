@@ -1,67 +1,162 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaMap, FaPlus } from "react-icons/fa";
 import UiSelect from "../ui/atoms/select";
 import UiTable from "../ui/atoms/table";
 import UiTableButton from "../ui/atoms/button";
 import UiModal from "../ui/atoms/modal";
 
+const API_URL = "http://91.197.97.68:33333/api/v1";
+
 export default function RacesToday() {
   const [statusFilter, setStatusFilter] = useState("");
-  const [trips, setTrips] = useState([
-    {
-      id: 1,
-      driver: "Иванов И.И.",
-      telegram: "@ivanov_driver",
-      vehicle: "ТС-001",
-      carNumber: "А123БВ",
-      routeStart: "Москва",
-      routeEnd: "Спб",
-      route: "Москва → Спб",
-      date: "2024-01-15",
-      status: "в пути",
-      comment: "Обычный рейс",
-      customerContacts: "+7 123 456 7890",
-      loadingDateTime: "2024-01-15T08:00",
-    },
-    {
-      id: 2,
-      driver: "Петров П.П.",
-      telegram: "@petrov_driver",
-      vehicle: "ТС-002",
-      carNumber: "В456ГД",
-      routeStart: "Спб",
-      routeEnd: "Москва",
-      route: "Спб → Москва",
-      date: "2024-01-15",
-      status: "ожидает",
-      comment: "Срочная доставка",
-      customerContacts: "+7 098 765 4321",
-      loadingDateTime: "2024-01-15T14:30",
-    },
-  ]);
-
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
 
+  // Тут храним текущего пользователя
+  const [currentUser, setCurrentUser] = useState({ role: "user" }); // пример, role может быть "admin"
+
   const [newTrip, setNewTrip] = useState({
-    driver: "",
-    telegram: "",
-    vehicle: "",
-    carNumber: "",
     routeStart: "",
     routeEnd: "",
     date: "",
-    status: "ожидает",
+    status: "Открыт",
     comment: "",
     customerContacts: "",
     loadingDateTime: "",
+    vehicleId: null,
+    driverId: null,
   });
 
   const statuses = [
-    { value: "в пути", label: "В пути" },
-    { value: "ожидает", label: "В ожидании" },
-    { value: "проблемный", label: "Проблемный" },
+    { value: "Открыт", label: "Открыт" },
+    { value: "В пути", label: "В пути" },
+    { value: "Загружен", label: "Загружен" },
+    { value: "Закрыт", label: "Закрыт" },
   ];
+
+  const fetchAllOrders = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Нет токена");
+
+      const res = await fetch(`${API_URL}/logist-order/all`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Ошибка ${res.status}: ${text}`);
+      }
+
+      const data = await res.json();
+
+      const formatted = data.map((trip) => ({
+        id: trip.id,
+        status: trip.status,
+        loadingTime: trip.loading_time,
+        loadingAddress: trip.loading_address,
+        unloadingTime: trip.unloading_time,
+        unloadingAddress: trip.unloading_address,
+        customerContacts: trip.customer_contacts,
+        comments: trip.comments,
+        price: trip.price,
+        drivers: trip.driver_orders.map((d) => ({
+          id: d.id,
+          driverId: d.driver_id,
+          status: d.status,
+          createDt: d.create_dt,
+          updateDt: d.update_dt,
+        })),
+        // Добавляем поля для модалки
+        driver: trip.driver_name || "-",
+        telegram: trip.driver_telegram || "-",
+        vehicle: trip.vehicle_name || "-",
+        carNumber: trip.car_number || "-",
+        route: `${trip.loading_address ?? "-"} → ${trip.unloading_address ?? "-"}`,
+        date: trip.date,
+        comment: trip.comments,
+        loadingDateTime: trip.loading_time,
+      }));
+
+      setTrips(formatted);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddTrip = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("accessToken");
+      const user_id = localStorage.getItem("currentUser");
+      if (!token) throw new Error("Нет токена");
+  
+      if (!newTrip.routeStart || !newTrip.routeEnd || !newTrip.loadingDateTime || !newTrip.date) {
+        alert("Заполните все обязательные поля");
+        return;
+      }
+  
+      const params = new URLSearchParams({
+        user_id, // или текущий пользователь
+        status: newTrip.status || "Открыт",
+        loading_time: newTrip.loadingDateTime + "T00:00:00",
+        loading_address: newTrip.routeStart,
+        unloading_time: newTrip.date + "T00:00:00",
+        unloading_address: newTrip.routeEnd,
+        customer_contacts: newTrip.customerContacts || "Не указано",
+        comments: newTrip.comment || "",
+        price: newTrip.price ? String(newTrip.price) : "0",
+      });
+  
+      const res = await fetch(`${API_URL}/logist-order?${params.toString()}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Ошибка ${res.status}: ${text}`);
+      }
+  
+      await fetchAllOrders();
+      setIsAddTripDialogOpen(false);
+      setNewTrip({
+        routeStart: "",
+        routeEnd: "",
+        date: "",
+        status: "Открыт",
+        comment: "",
+        customerContacts: "",
+        loadingDateTime: "",
+        price: null,
+      });
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+  
+  
+
+  useEffect(() => {
+    fetchAllOrders();
+    // Загружаем текущего пользователя
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    if (user) setCurrentUser(user);
+  }, []);
+
+  const closeModal = () => setSelectedTrip(null);
 
   const handleStatusChange = (id, newStatus) => {
     setTrips((prev) =>
@@ -71,42 +166,42 @@ export default function RacesToday() {
     );
   };
 
-  const closeModal = () => setSelectedTrip(null);
-
-  // ВАЖНО: Отменяем дефолтное поведение формы
-  const handleAddTrip = (e) => {
-    e.preventDefault();
-
-    if (
-      newTrip.driver.trim() &&
-      newTrip.vehicle.trim() &&
-      newTrip.routeStart.trim() &&
-      newTrip.routeEnd.trim() &&
-      newTrip.date.trim()
-    ) {
-      const maxId = trips.length > 0 ? Math.max(...trips.map((t) => t.id)) : 0;
-      const trip = {
-        id: maxId + 1,
-        ...newTrip,
-        route: `${newTrip.routeStart} → ${newTrip.routeEnd}`,
-      };
-      setTrips([...trips, trip]);
-      setIsAddTripDialogOpen(false);
-      setNewTrip({
-        driver: "",
-        telegram: "",
-        vehicle: "",
-        carNumber: "",
-        routeStart: "",
-        routeEnd: "",
-        date: "",
-        status: "ожидает",
-        comment: "",
-        customerContacts: "",
-        loadingDateTime: "",
+  const handleDeleteTrip = async (tripId) => {
+    if (!window.confirm("Вы уверены, что хотите удалить рейс?")) return;
+  
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Нет токена");
+  
+      const res = await fetch(`${API_URL}/logist-order?order_id=${tripId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
+  
+      if (res.status === 403) {
+        throw new Error("У вас нет прав на удаление этого рейса");
+      }
+  
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Ошибка ${res.status}: ${text}`);
+      }
+  
+      // Обновляем список рейсов после удаления
+      await fetchAllOrders();
+      setSelectedTrip(null);
+      alert("Рейс успешно удалён");
+    } catch (err) {
+      alert(err.message);
     }
   };
+  
+
+  if (loading) return <p>Загрузка...</p>;
+  if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
 
   return (
     <div className="racestoday bg-card-light">
@@ -115,7 +210,7 @@ export default function RacesToday() {
           <FaMap /> Рейсы на сегодня
         </h1>
         <UiTableButton
-          label="Добавить ТО"
+          label="Добавить рейс"
           icon={FaPlus}
           onClick={() => setIsAddTripDialogOpen(true)}
         />
@@ -133,24 +228,21 @@ export default function RacesToday() {
 
       <UiTable
         columns={[
-          { header: "Водитель", render: (t) => t.driver },
-          { header: "ТС", render: (t) => t.vehicle },
-          { header: "Маршрут", render: (t) => t.route },
-          { header: "Дата", render: (t) => t.date },
           {
-            header: "Статус",
-            className: "table-status",
-            render: (t) => (
-              <UiSelect
-                value={t.status}
-                onChange={(val) => handleStatusChange(t.id, val)}
-                placeholder="Выберите статус"
-                options={statuses}
-              />
-            ),
+            header: "Маршрут",
+            render: (t) => t.route,
           },
+          { header: "Статус", render: (t) => t.status },
           {
-            header: "Кнопка",
+            header: "Водители",
+            render: (t) =>
+              t.drivers.map((d) => `ID:${d.driverId} (${d.status})`).join(", "),
+          },
+          { header: "Контакты", render: (t) => t.customerContacts },
+          { header: "Комментарий", render: (t) => t.comment },
+          { header: "Цена", render: (t) => t.price },
+          {
+            header: "Действие",
             render: (t) => (
               <UiTableButton
                 label="Информация"
@@ -164,133 +256,74 @@ export default function RacesToday() {
         )}
       />
 
-      {/* Модалка добавления рейса */}
       {isAddTripDialogOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-          onClick={() => setIsAddTripDialogOpen(false)}
+        <UiModal
+          title="Добавить рейс"
+          onClose={() => setIsAddTripDialogOpen(false)}
         >
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: 20,
-              borderRadius: 8,
-              minWidth: 400,
-              maxWidth: "90%",
-              position: "relative",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>Добавить новый рейс</h3>
-            <UiModal
-              title="Добавить рейс"
-              onClose={() => setIsAddTripDialogOpen(false)}
-            >
-              <form className="modal-form" onSubmit={handleAddTrip}>
-                <input
-                  type="text"
-                  placeholder="Водитель"
-                  value={newTrip.driver}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, driver: e.target.value })
-                  }
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Телеграм"
-                  value={newTrip.telegram}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, telegram: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="ТС"
-                  value={newTrip.vehicle}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, vehicle: e.target.value })
-                  }
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Госномер"
-                  value={newTrip.carNumber}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, carNumber: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Начало маршрута"
-                  value={newTrip.routeStart}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, routeStart: e.target.value })
-                  }
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Конец маршрута"
-                  value={newTrip.routeEnd}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, routeEnd: e.target.value })
-                  }
-                  required
-                />
-                <input
-                  type="date"
-                  value={newTrip.date}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, date: e.target.value })
-                  }
-                  required
-                />
-                <input
-                  type="datetime-local"
-                  value={newTrip.loadingDateTime}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, loadingDateTime: e.target.value })
-                  }
-                  required
-                />
-                <textarea
-                  placeholder="Комментарий"
-                  value={newTrip.comment}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, comment: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Контакты клиента"
-                  value={newTrip.customerContacts}
-                  onChange={(e) =>
-                    setNewTrip({ ...newTrip, customerContacts: e.target.value })
-                  }
-                />
-                <button type="submit" className="ui-table-button">
-                  Сохранить
-                </button>
-              </form>
-            </UiModal>
-          </div>
-        </div>
+          <form className="modal-form" onSubmit={handleAddTrip}>
+            <input
+              type="text"
+              placeholder="Начало маршрута"
+              value={newTrip.routeStart}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, routeStart: e.target.value })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="Конец маршрута"
+              value={newTrip.routeEnd}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, routeEnd: e.target.value })
+              }
+              required
+            />
+            <input
+              type="date"
+              value={newTrip.date}
+              onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
+              required
+            />
+            <input
+              type="date"
+              value={newTrip.loadingDateTime}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, loadingDateTime: e.target.value })
+              }
+              required
+            />
+            <textarea
+              placeholder="Комментарий"
+              value={newTrip.comment}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, comment: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Контакты клиента"
+              value={newTrip.customerContacts}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, customerContacts: e.target.value })
+              }
+              required
+            />
+            <input
+              type="number"
+              placeholder="Цена"
+              value={newTrip.price || ""}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, price: Number(e.target.value) })
+              }
+              required
+            />
+            <button type="submit">Сохранить</button>
+          </form>
+        </UiModal>
       )}
 
-      {/* Модальное окно информации */}
       {selectedTrip && (
         <UiModal title="Детали рейса" onClose={closeModal}>
           <div className="details-container">
@@ -353,10 +386,22 @@ export default function RacesToday() {
             </section>
           </div>
 
+            <UiTableButton
+              label="Удалить рейс"
+              onClick={() => handleDeleteTrip(selectedTrip.id)}
+              style={{
+                marginTop: 12,
+                marginLeft: 15,
+                backgroundColor: "#e74c3c",
+                color: "#fff",
+                width: "100%",
+              }}
+            />
+
           <UiTableButton
             label="Закрыть"
             onClick={closeModal}
-            style={{ marginTop: 24, width: "100%" }}
+            style={{ marginTop: 12, width: "100%" }}
           />
         </UiModal>
       )}

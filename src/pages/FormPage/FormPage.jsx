@@ -44,8 +44,9 @@ export default function AuthPage() {
     if (data.expires_in) {
       localStorage.setItem("tokenExpires", Date.now() + data.expires_in * 1000);
     }
+   
 
-    navigate('/admin');
+    navigate("/admin");
   };
 
   // ----------------- REGISTER -----------------
@@ -59,9 +60,12 @@ export default function AuthPage() {
       password: registerData.password,
     });
 
-    const res = await fetch(`http://91.197.97.68:33333/api/v1/auth/register?${params.toString()}`, {
-      method: "POST",
-    });
+    const res = await fetch(
+      `http://91.197.97.68:33333/api/v1/auth/register?${params.toString()}`,
+      {
+        method: "POST",
+      }
+    );
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Ошибка регистрации");
@@ -73,16 +77,28 @@ export default function AuthPage() {
   return (
     <div className="auth-container">
       <div className="tabs">
-        <button className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>
+        <button
+          className={tab === "login" ? "active" : ""}
+          onClick={() => setTab("login")}
+        >
           Вход
         </button>
-        <button className={tab === "register" ? "active" : ""} onClick={() => setTab("register")}>
+        <button
+          className={tab === "register" ? "active" : ""}
+          onClick={() => setTab("register")}
+        >
           Регистрация
         </button>
       </div>
 
       {tab === "login" ? (
-        <form className="form" onSubmit={(e) => { e.preventDefault(); handleLogin(loginData.username, loginData.password); }}>
+        <form
+          className="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin(loginData.username, loginData.password);
+          }}
+        >
           <h2>Авторизация</h2>
           <input
             type="text"
