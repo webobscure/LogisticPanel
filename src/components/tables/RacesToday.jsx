@@ -386,7 +386,7 @@ export default function RacesToday() {
             </section>
           </div>
 
-            <UiTableButton
+            {/* <UiTableButton
               label="Удалить рейс"
               onClick={() => handleDeleteTrip(selectedTrip.id)}
               style={{
@@ -396,7 +396,7 @@ export default function RacesToday() {
                 color: "#fff",
                 width: "100%",
               }}
-            />
+            /> */}
 
           <UiTableButton
             label="Закрыть"
