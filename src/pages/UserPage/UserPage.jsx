@@ -9,7 +9,7 @@ import NavPanel from "../../components/ui/organisms/NavPanel";
 import { Header } from "../../components/ui/molecules/Header";
 
 export default function UserPage() {
-const API_URL = "http://91.197.97.68:33333/api/v1";
+const API_URL = "https://dlm-agent.ru/api/v1/users/me";
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
