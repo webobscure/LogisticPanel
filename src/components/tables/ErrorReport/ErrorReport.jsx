@@ -4,6 +4,7 @@ import { FiAlertTriangle } from "react-icons/fi";
 import UiTable from "../../ui/atoms/table";
 import UiTableButton from "../../ui/atoms/button";
 import UiModal from "../../ui/atoms/modal";
+import Loader from "../../ui/molecules/Loader";
 
 const API_URL = "https://dlm-agent.ru/api/v1";
 
@@ -14,6 +15,24 @@ export default function ErrorReport() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Получаем ФИО пользователя по ID
+  const fetchUserInfo = async (userId) => {
+    if (!userId) return "-";
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${API_URL}/user?id=${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+      const data = await res.json();
+      const user = data[0];
+      return user ? `${user.surname} ${user.name}` : "-";
+    } catch (err) {
+      console.error("Ошибка при загрузке пользователя:", err);
+      return "-";
+    }
+  };
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -36,7 +55,18 @@ export default function ErrorReport() {
         }
 
         const data = await res.json();
-        setReports(data);
+
+        // Добавляем полное имя пользователя
+        const formatted = data.map((report) => {
+          const fullName = report.user
+            ? `${report.user.surname} ${report.user.name}`
+            : "-";
+          const phone = report.user.phone
+          return { ...report, fullName, phone };
+        });
+        setReports(formatted);
+
+        setReports(formatted);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -48,7 +78,7 @@ export default function ErrorReport() {
   }, []);
 
   const openPhotoGallery = (photos) => {
-    if (photos.length > 0) {
+    if (photos?.length > 0) {
       setSelectedPhotos(photos);
       setCurrentPhotoIndex(0);
       setIsModalOpen(true);
@@ -66,7 +96,7 @@ export default function ErrorReport() {
     setSelectedPhotos([]);
   };
 
-  if (loading) return <p>Загрузка...</p>;
+  if (loading) return <Loader />;
   if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
 
   const visibleReports = reports.filter((report) => !report.resolved);
@@ -83,7 +113,7 @@ export default function ErrorReport() {
         ) : (
           <UiTable
             columns={[
-              { header: "ФИО", render: (r) => r.name || "Василий Пупкин" },
+              { header: "ФИО", render: (r) => r.fullName || "-" },
               {
                 header: "Дата и время",
                 render: (r) => {
@@ -93,7 +123,6 @@ export default function ErrorReport() {
                   const year = dt.getFullYear();
                   const hours = String(dt.getHours()).padStart(2, "0");
                   const minutes = String(dt.getMinutes()).padStart(2, "0");
-
                   return `${day}.${month}.${year} ${hours}:${minutes}`;
                 },
               },
@@ -101,15 +130,15 @@ export default function ErrorReport() {
                 header: "Фотографии",
                 render: (r) => (
                   <UiTableButton
-                    label={`${r.images.length} фото`}
-                    onClick={() => openPhotoGallery(r.photos)}
+                    label={`${r.images?.length || 0} фото`}
+                    onClick={() => openPhotoGallery(r.images || [])}
                     icon={FaImage}
                   />
                 ),
               },
               {
                 header: "Документы",
-                render: (r) => r.documents?.join(", ") || "Справка.doc",
+                render: (r) => r.documents?.join(", ") || "-",
               },
               {
                 header: "Действия",
@@ -117,7 +146,7 @@ export default function ErrorReport() {
                   <UiTableButton
                     label="Связаться"
                     icon={FaPhone}
-                    href={`tel:${r.phone}`}
+                    href={`tel:${r.user?.phone}`}
                   />
                 ),
               },
@@ -125,8 +154,8 @@ export default function ErrorReport() {
                 header: "Статус",
                 render: (r) => (
                   <>
-                    <FaCircle color={r.resolved ? "green" : "red"} />{" "}
-                    {r.resolved ? "Решено" : "Не решено"}
+                    <FaCircle color={r.status ? "green" : "red"} />{" "}
+                    {r.status }
                   </>
                 ),
               },

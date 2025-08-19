@@ -12,7 +12,6 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { UserProvider } from "./components/UserContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
     <BrowserRouter>
       <UserProvider>
         <Routes>
@@ -52,5 +51,4 @@ createRoot(document.getElementById("root")).render(
         </Routes>
       </UserProvider>
     </BrowserRouter>
-  </StrictMode>
 );

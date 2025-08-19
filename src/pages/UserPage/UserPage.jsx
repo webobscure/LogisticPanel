@@ -7,9 +7,11 @@ import UiSelect from "../../components/ui/atoms/select";
 import UiTable from "../../components/ui/atoms/table";
 import NavPanel from "../../components/ui/organisms/NavPanel";
 import { Header } from "../../components/ui/molecules/Header";
+import { PuffLoader } from "react-spinners";
+import Loader from "../../components/ui/molecules/Loader";
 
 export default function UserPage() {
-const API_URL = "https://dlm-agent.ru/api/v1";
+  const API_URL = "https://dlm-agent.ru/api/v1";
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -61,7 +63,7 @@ const API_URL = "https://dlm-agent.ru/api/v1";
 
         const data = await res.json();
 
-        const formatted = data.map(u => ({
+        const formatted = data.map((u) => ({
           id: u.id,
           firstName: u.name || "",
           lastName: u.surname || "",
@@ -72,7 +74,6 @@ const API_URL = "https://dlm-agent.ru/api/v1";
           verified: u.is_verified,
           banned: u.is_banned,
         }));
-        
 
         setUsers(formatted);
         setFilteredUsers(formatted);
@@ -225,7 +226,9 @@ const API_URL = "https://dlm-agent.ru/api/v1";
           </div>
 
           {/* Статусы загрузки / ошибки */}
-          {loading && <p>Загрузка пользователей...</p>}
+          {loading && (
+            <Loader />
+          )}
           {error && <p style={{ color: "red" }}>Ошибка: {error}</p>}
           {!loading && filteredUsers.length === 0 && (
             <p>Пользователи не найдены.</p>

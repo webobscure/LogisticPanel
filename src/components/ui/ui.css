@@ -251,7 +251,12 @@
   cursor: pointer;
   transition: background-color 0.25s ease;
 }
-
+.racestoday .filter-container {
+  width: 100%;
+}
+.ui-modal-content .ui-table-button {
+  margin: 0 auto;
+}
 .ui-table-button:hover {
   background-color: #303f9f;
   color: #fff;
