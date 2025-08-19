@@ -5,7 +5,7 @@ import UiTable from "../../ui/atoms/table";
 import UiTableButton from "../../ui/atoms/button";
 import UiModal from "../../ui/atoms/modal";
 
-const API_URL = "https://dlm-agent.ru/api/v1/users/me";
+const API_URL = "https://dlm-agent.ru/api/v1";
 
 export default function ErrorReport() {
   const [reports, setReports] = useState([]);
@@ -83,19 +83,19 @@ export default function ErrorReport() {
         ) : (
           <UiTable
             columns={[
-              { header: "ФИО", render: (r) => r.name },
-              { header: "Дата и время", render: (r) => r.datetime },
+              { header: "ФИО", render: (r) => r.name || "Василий Пупкин" },
+              { header: "Дата и время", render: (r) => r.create_dt },
               {
                 header: "Фотографии",
                 render: (r) => (
                   <UiTableButton
-                    label={`${r.photos.length} фото`}
+                    label={`${r.images.length} фото`}
                     onClick={() => openPhotoGallery(r.photos)}
                     icon={FaImage}
                   />
                 ),
               },
-              { header: "Документы", render: (r) => r.documents.join(", ") },
+              { header: "Документы", render: (r) => r.documents?.join(", ") || "Справка.doc" },
               {
                 header: "Действия",
                 render: (r) => (
