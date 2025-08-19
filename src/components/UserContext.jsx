@@ -4,14 +4,11 @@ import { fetchCurrentUser } from "./api";
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // Сначала попробуем взять из localStorage
-    const stored = localStorage.getItem("userName");
-    return stored ? { fullName: stored } : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Функция загрузки пользователя с сервера
   const loadUser = async () => {
+    setLoading(true);
     try {
       const data = await fetchCurrentUser();
       const fullName = `${data.name} ${data.surname}`;
@@ -21,22 +18,34 @@ export const UserProvider = ({ children }) => {
       console.error(err);
       setUser(null);
       localStorage.removeItem("userName");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadUser();
-  }, []); // при монтировании
+  const setUserFromLogin = (fullName) => {
+    setUser({ fullName });
+    localStorage.setItem("userName", fullName);
+  };
 
-  // Можно вызывать при логине/логауте, чтобы обновить user
-  const refreshUser = () => loadUser();
+  useEffect(() => {
+    const stored = localStorage.getItem("userName");
+    if (stored) {
+      setUser({ fullName: stored });
+      setLoading(false);
+    } else if (localStorage.getItem("accessToken")) {
+      loadUser();
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser, refreshUser }}>
+    <UserContext.Provider value={{ user, loading, setUser, setUserFromLogin, loadUser }}>
       {children}
     </UserContext.Provider>
   );
 };
-// eslint-disable-next-line react-refresh/only-export-components
-export const useUser = () => useContext(UserContext);
 
+// **Экспорт хука useUser**
+export const useUser = () => useContext(UserContext);

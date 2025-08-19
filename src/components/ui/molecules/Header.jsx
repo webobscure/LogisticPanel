@@ -3,13 +3,13 @@ import { useUser } from "../../UserContext";
 import "./Header.css";
 
 export const Header = ({ title = "Панель управления" }) => {
-  const { user } = useUser();
+  const { user, loading } = useUser();
 
   return (
     <section className="header">
       <h1>{title}</h1>
       <span className="header_user-name">
-        {user?.fullName }
+        {loading ? "Загрузка..." : user?.fullName || "Гость"}
       </span>
     </section>
   );

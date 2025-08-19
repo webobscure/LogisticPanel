@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import "./FormPage.css";
 import { useNavigate } from "react-router";
+import { useUser } from "../../components/UserContext";
+import { fetchCurrentUser } from "../../components/api";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const { setUserFromLogin } = useUser(); // берём метод из контекста
   const [tab, setTab] = useState("login");
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [registerData, setRegisterData] = useState({
@@ -22,32 +25,39 @@ export default function AuthPage() {
 
   // ----------------- LOGIN -----------------
   const handleLogin = async (username, password) => {
-    const body = new URLSearchParams();
-    body.append("username", username);
-    body.append("password", password);
-    body.append("grant_type", "password");
-    body.append("scope", scope);
-    body.append("client_id", client_id);
-    body.append("client_secret", client_secret);
+  const body = new URLSearchParams();
+  body.append("username", username);
+  body.append("password", password);
+  body.append("grant_type", "password");
+  body.append("scope", scope);
+  body.append("client_id", client_id);
+  body.append("client_secret", client_secret);
 
-    const res = await fetch(" https://dlm-agent.ru/api/v1/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body,
-    });
+  const res = await fetch("https://dlm-agent.ru/api/v1/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body,
+  });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Ошибка входа");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || "Ошибка входа");
 
-    localStorage.setItem("accessToken", data.access_token);
-    localStorage.setItem("refreshToken", data.refresh_token);
-    if (data.expires_in) {
-      localStorage.setItem("tokenExpires", Date.now() + data.expires_in * 1000);
-    }
-   
+  localStorage.setItem("accessToken", data.access_token);
+  localStorage.setItem("refreshToken", data.refresh_token);
+  if (data.expires_in) {
+    localStorage.setItem("tokenExpires", Date.now() + data.expires_in * 1000);
+  }
 
-    navigate("/admin");
-  };
+  // --------------------------
+  // После логина запрашиваем полные данные пользователя
+  const userData = await fetchCurrentUser(); // вернёт { name, surname, ... }
+  const fullName = `${userData.name} ${userData.surname}`;
+  setUserFromLogin(fullName); // обновляем контекст
+  // --------------------------
+
+  navigate("/admin");
+};
+
 
   // ----------------- REGISTER -----------------
   const handleRegister = async (e) => {
