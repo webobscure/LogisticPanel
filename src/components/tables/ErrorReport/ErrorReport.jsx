@@ -84,7 +84,19 @@ export default function ErrorReport() {
           <UiTable
             columns={[
               { header: "ФИО", render: (r) => r.name || "Василий Пупкин" },
-              { header: "Дата и время", render: (r) => r.create_dt },
+              {
+                header: "Дата и время",
+                render: (r) => {
+                  const dt = new Date(r.create_dt);
+                  const day = String(dt.getDate()).padStart(2, "0");
+                  const month = String(dt.getMonth() + 1).padStart(2, "0");
+                  const year = dt.getFullYear();
+                  const hours = String(dt.getHours()).padStart(2, "0");
+                  const minutes = String(dt.getMinutes()).padStart(2, "0");
+
+                  return `${day}.${month}.${year} ${hours}:${minutes}`;
+                },
+              },
               {
                 header: "Фотографии",
                 render: (r) => (
@@ -95,7 +107,10 @@ export default function ErrorReport() {
                   />
                 ),
               },
-              { header: "Документы", render: (r) => r.documents?.join(", ") || "Справка.doc" },
+              {
+                header: "Документы",
+                render: (r) => r.documents?.join(", ") || "Справка.doc",
+              },
               {
                 header: "Действия",
                 render: (r) => (
