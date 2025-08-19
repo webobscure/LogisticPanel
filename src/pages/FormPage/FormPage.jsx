@@ -30,7 +30,7 @@ export default function AuthPage() {
     body.append("client_id", client_id);
     body.append("client_secret", client_secret);
 
-    const res = await fetch("http://91.197.97.68:33333/api/v1/auth/login", {
+    const res = await fetch(" https://dlm-agent.ru/api/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body,
@@ -61,7 +61,7 @@ export default function AuthPage() {
     });
 
     const res = await fetch(
-      `http://91.197.97.68:33333/api/v1/auth/register?${params.toString()}`,
+      ` https://dlm-agent.ru/api/v1/auth/register?${params.toString()}`,
       {
         method: "POST",
       }

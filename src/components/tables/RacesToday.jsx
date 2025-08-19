@@ -5,7 +5,7 @@ import UiTable from "../ui/atoms/table";
 import UiTableButton from "../ui/atoms/button";
 import UiModal from "../ui/atoms/modal";
 
-const API_URL = "http://91.197.97.68:33333/api/v1";
+const API_URL = "https://dlm-agent.ru/api/v1/users/me1";
 
 export default function RacesToday() {
   const [statusFilter, setStatusFilter] = useState("");
