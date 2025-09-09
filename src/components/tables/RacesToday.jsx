@@ -11,7 +11,7 @@ const API_URL = "https://dlm-agent.ru/api/v1";
 export default function RacesToday() {
   const [statusFilter, setStatusFilter] = useState("");
   const [trips, setTrips] = useState([]);
-  const [vehicles, setVehicles] = useState([])
+  const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTrip, setSelectedTrip] = useState(null);
@@ -72,21 +72,25 @@ export default function RacesToday() {
       const formatted = data.map((trip) => ({
         id: trip.id,
         status: trip.status,
+        // дата/время
         time: `${handleTime(trip.loading_time)} → ${handleTime(
           trip.unloading_time
         )}`,
-        loadingAddress: trip.loading_address,
-        unloadingAddress: trip.unloading_address,
+        // маршрут
+        route: `${trip.loading_city ?? "-"}, ${trip.loading_street ?? "-"} → ${
+          trip.unloading_city ?? "-"
+        }, ${trip.unloading_street ?? "-"}`,
+        // заказчик
+        customerName: trip.customer_name,
         customerContacts: trip.customer_contacts,
-        comments: trip.comments,
-        price: trip.price,
-        driverOrders: trip.driver_orders, // ⬅️ просто сохраняем
-        route: `${trip.loading_address ?? "-"} → ${
-          trip.unloading_address ?? "-"
-        }`,
-        date: trip.date,
+        // комментарии и цена
         comment: trip.comments,
+        price: trip.price,
+        // водитель (один, может быть null)
+        driverOrder: trip.driver_order,
+        // для детального просмотра
         loadingDateTime: trip.loading_time,
+        unloadingDateTime: trip.unloading_time,
       }));
 
       setTrips(formatted);
@@ -132,35 +136,41 @@ export default function RacesToday() {
 
   // Загружаем детали рейса и водителей
   const openTripDetails = async (trip) => {
-    try {
-      const detailedDrivers = await Promise.all(
-        trip.driverOrders.map(async (d) => {
-          const driver = await fetchDriverInfo(d.driver_id);
-          const vehicle = await fetchVehicleInfo(driver?.vehicles?.[0]?.id);
+  try {
+    // Нормализуем в массив
+    const orders = Array.isArray(trip.driverOrders)
+      ? trip.driverOrders
+      : trip.driver_order
+      ? [trip.driver_order]
+      : [];
 
-          return {
-            id: d.id,
-            driverId: d.driver_id,
-            status: d.status,
-            time: `${handleTime(d.loading_time)} → ${handleTime(
-              d.unloading_time
-            )}`,
-            name: driver ? `${driver.surname} ${driver.name}` : "-",
-            phone: driver?.phone || "-",
-            telegram: driver?.telegram_nickname || "-",
-            vehicle: vehicle?.brand || "-",
-            carNumber: vehicle?.state_number || "-",
-          };
-        })
-      );
+    const detailedDrivers = await Promise.all(
+      orders.map(async (d) => {
+        const driver = await fetchDriverInfo(d.driver_id);
+        const vehicle = await fetchVehicleInfo(driver?.vehicles?.[0]?.id);
 
-      setSelectedTrip({ ...trip, drivers: detailedDrivers });
-    } catch (err) {
-      console.error("Ошибка при загрузке деталей рейса:", err);
-    }
-  };
+        return {
+          id: d.id,
+          driverId: d.driver_id,
+          status: d.status,
+          time: `${handleTime(d.loading_time)} → ${handleTime(
+            d.unloading_time
+          )}`,
+          name: driver ? `${driver.surname} ${driver.name}` : "-",
+          phone: driver?.phone || "-",
+          telegram: driver?.telegram_nickname || "-",
+          vehicle: vehicle?.brand || "-",
+          carNumber: vehicle?.state_number || "-",
+        };
+      })
+    );
 
-  
+    setSelectedTrip({ ...trip, drivers: detailedDrivers });
+  } catch (err) {
+    console.error("Ошибка при загрузке деталей рейса:", err);
+  }
+};
+
 
   useEffect(() => {
     fetchAllOrders();
@@ -171,7 +181,7 @@ export default function RacesToday() {
 
   const closeModal = () => setSelectedTrip(null);
 
- // Загрузка списка машин
+  // Загрузка списка машин
   const fetchVehicles = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -187,7 +197,7 @@ export default function RacesToday() {
     }
   };
 
-    const openAddTripModal = () => {
+  const openAddTripModal = () => {
     fetchVehicles();
     setIsAddTripDialogOpen(true);
   };
@@ -199,15 +209,22 @@ export default function RacesToday() {
       const user_id = localStorage.getItem("currentUser");
       if (!token) throw new Error("Нет токена");
 
-      if (!newTrip.routeStart || !newTrip.routeEnd || !newTrip.loadingDateTime || !newTrip.date || !newTrip.vehicleId) {
+      if (
+        !newTrip.routeStart ||
+        !newTrip.routeEnd ||
+        !newTrip.loadingDateTime ||
+        !newTrip.date ||
+        !newTrip.vehicleId
+      ) {
         alert("Заполните все обязательные поля");
         return;
       }
 
       // Получаем водителя по выбранной машине
-      const vehicle = vehicles.find(v => v.id === newTrip.vehicleId);
+      const vehicle = vehicles.find((v) => v.id === newTrip.vehicleId);
       const driverId = vehicle?.driver_id;
-      if (!driverId) throw new Error("Для выбранной машины не назначен водитель");
+      if (!driverId)
+        throw new Error("Для выбранной машины не назначен водитель");
 
       const params = new URLSearchParams({
         user_id,
@@ -280,18 +297,16 @@ export default function RacesToday() {
 
       <UiTable
         columns={[
-          {
-            header: "Маршрут",
-            render: (t) => t.route,
-          },
+          { header: "Маршрут", render: (t) => t.route },
           { header: "Статус", render: (t) => t.status },
           {
-            header: "Водители",
+            header: "Водитель",
             render: (t) =>
-              t.driverOrders
-                ?.map((d) => `ID:${d.driver_id} (${d.status})`)
-                .join(", ") || "-",
+              t.driverOrder
+                ? `ID:${t.driverOrder.driver_id} (${t.driverOrder.status})`
+                : "-",
           },
+          { header: "Заказчик", render: (t) => t.customerName },
           { header: "Контакты", render: (t) => t.customerContacts },
           { header: "Комментарий", render: (t) => t.comment },
           { header: "Цена", render: (t) => t.price },
@@ -310,21 +325,77 @@ export default function RacesToday() {
         )}
       />
 
-       {isAddTripDialogOpen && (
-        <UiModal title="Добавить рейс" onClose={() => setIsAddTripDialogOpen(false)}>
+      {isAddTripDialogOpen && (
+        <UiModal
+          title="Добавить рейс"
+          onClose={() => setIsAddTripDialogOpen(false)}
+        >
           <form className="modal-form" onSubmit={handleAddTrip}>
-            <input type="text" placeholder="Начало маршрута" value={newTrip.routeStart} onChange={e => setNewTrip({ ...newTrip, routeStart: e.target.value })} required />
-            <input type="text" placeholder="Конец маршрута" value={newTrip.routeEnd} onChange={e => setNewTrip({ ...newTrip, routeEnd: e.target.value })} required />
-            <input type="date" value={newTrip.date} onChange={e => setNewTrip({ ...newTrip, date: e.target.value })} required />
-            <input type="date" value={newTrip.loadingDateTime} onChange={e => setNewTrip({ ...newTrip, loadingDateTime: e.target.value })} required />
-            <textarea placeholder="Комментарий" value={newTrip.comment} onChange={e => setNewTrip({ ...newTrip, comment: e.target.value })} />
-            <input type="text" placeholder="Контакты клиента" value={newTrip.customerContacts} onChange={e => setNewTrip({ ...newTrip, customerContacts: e.target.value })} required />
-            <input type="number" placeholder="Цена" value={newTrip.price || ""} onChange={e => setNewTrip({ ...newTrip, price: Number(e.target.value) })} required />
+            <input
+              type="text"
+              placeholder="Начало маршрута"
+              value={newTrip.routeStart}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, routeStart: e.target.value })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="Конец маршрута"
+              value={newTrip.routeEnd}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, routeEnd: e.target.value })
+              }
+              required
+            />
+            <input
+              type="date"
+              value={newTrip.date}
+              onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
+              required
+            />
+            <input
+              type="date"
+              value={newTrip.loadingDateTime}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, loadingDateTime: e.target.value })
+              }
+              required
+            />
+            <textarea
+              placeholder="Комментарий"
+              value={newTrip.comment}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, comment: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Контакты клиента"
+              value={newTrip.customerContacts}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, customerContacts: e.target.value })
+              }
+              required
+            />
+            <input
+              type="number"
+              placeholder="Цена"
+              value={newTrip.price || ""}
+              onChange={(e) =>
+                setNewTrip({ ...newTrip, price: Number(e.target.value) })
+              }
+              required
+            />
 
             <UiSelect
-              options={vehicles.map(v => ({ value: v.id, label: `${v.brand} (${v.state_number})` }))}
+              options={vehicles.map((v) => ({
+                value: v.id,
+                label: `${v.brand} (${v.state_number})`,
+              }))}
               value={newTrip.vehicleId}
-              onChange={val => setNewTrip({ ...newTrip, vehicleId: val })}
+              onChange={(val) => setNewTrip({ ...newTrip, vehicleId: val })}
               placeholder="Выберите ТС"
               required
             />
@@ -337,33 +408,37 @@ export default function RacesToday() {
       {selectedTrip && (
         <UiModal title="Детали рейса" onClose={closeModal}>
           <div className="details-container">
-            <section className="details-section">
-              <h4 className="details-section-title">Детали водителей</h4>
-              {selectedTrip.drivers.map((d) => (
-                <div key={d.driverId} className="details-grid">
+             {selectedTrip.drivers?.length > 0 && (
+              <section className="details-section">
+                <h4 className="details-section-title">Детали водителя</h4>
+                <div className="details-grid">
                   <div className="details-item">
                     <label>Водитель:</label>
-                    <p>{d.name}</p>
+                    <p>{selectedTrip.driver.name}</p>
+                  </div>
+                  <div className="details-item">
+                    <label>Телефон:</label>
+                    <p>{selectedTrip.driver.phone}</p>
                   </div>
                   <div className="details-item">
                     <label>Телеграм:</label>
-                    <p>{d.telegram}</p>
+                    <p>{selectedTrip.driver.telegram}</p>
                   </div>
                   <div className="details-item">
                     <label>ТС:</label>
-                    <p>{d.vehicle}</p>
+                    <p>{selectedTrip.driver.vehicle}</p>
                   </div>
                   <div className="details-item">
                     <label>Номер машины:</label>
-                    <p>{d.carNumber}</p>
+                    <p>{selectedTrip.driver.carNumber}</p>
                   </div>
                   <div className="details-item">
                     <label>Статус:</label>
-                    <p>{d.status}</p>
+                    <p>{selectedTrip.driver.status}</p>
                   </div>
                 </div>
-              ))}
-            </section>
+              </section>
+            )}
 
             <section className="details-section">
               <h4 className="details-section-title">Детали рейса</h4>
@@ -391,6 +466,10 @@ export default function RacesToday() {
               <h4 className="details-section-title">Детали заказчика</h4>
               <div className="details-grid">
                 <div className="details-item">
+                  <label>Имя клиента:</label>
+                  <p>{selectedTrip.customerName}</p>
+                </div>
+                <div className="details-item">
                   <label>Контакты клиента:</label>
                   <p>{selectedTrip.customerContacts}</p>
                 </div>
@@ -404,13 +483,8 @@ export default function RacesToday() {
             <UiTableButton
               label="Закрыть"
               onClick={closeModal}
-              style={{ width: "100%", margin:"0 auto" }}
+              style={{ width: "100%", margin: "0 auto" }}
             />
-            {/* <UiTableButton
-              label="Удалить"
-              onClick={handleDeleteTrip}
-              style={{ marginTop: 12, width: "100%" }}
-            /> */}
           </div>
         </UiModal>
       )}
