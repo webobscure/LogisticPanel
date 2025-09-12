@@ -8,6 +8,12 @@ import { InfoItem } from "../../components/ui/molecules/InfoItem";
 import UiTableButton from "../../components/ui/atoms/button";
 import NavPanel from "../../components/ui/organisms/NavPanel";
 import { Header } from "../../components/ui/molecules/Header";
+import ErrorReport from "../../components/tables/ErrorReport/ErrorReport";
+import UsersTable from "../../components/tables/UsersTable";
+import VehiclesTable from "../../components/tables/VehiclesTable";
+import UsersSalaryTable from "../../components/tables/UsersSalaryTable";
+import DriversSalaryTable from "../../components/tables/DriversSalaryTable";
+import ProbegTable from "../../components/tables/ProbegTable";
 
 export default function AdminPage() {
   // ===== Линейный график =====
@@ -95,8 +101,13 @@ export default function AdminPage() {
 
         <div className="admin-panel-container__right">
           <Header title="Панель руководителя" />
-
-          <TopBlock>
+          <UsersTable />
+          <VehiclesTable />
+          <ErrorReport />
+          <UsersSalaryTable />
+          <DriversSalaryTable />
+          <ProbegTable />
+          {/* <TopBlock>
             <TotalWorkload />
             <InfoItem
               title="Месячный доход"
@@ -116,7 +127,6 @@ export default function AdminPage() {
             />
           </TopBlock>
           <div className="diagrams">
-            {/* Линейный график */}
             <div className="diagrams-item bg-card-light">
               <h3>Динамика по месяцам</h3>
               <Chart
@@ -127,7 +137,6 @@ export default function AdminPage() {
               />
             </div>
 
-            {/* Кольцевая диаграмма */}
             <div className="diagrams-item  bg-card-light">
               <h3>Распределение ТС</h3>
               <Chart
@@ -138,7 +147,6 @@ export default function AdminPage() {
               />
             </div>
 
-            {/* Столбчатый график */}
             <div className="diagrams-item  bg-card-light">
               <h3>Эффективность водителей</h3>
               <Chart
@@ -149,7 +157,6 @@ export default function AdminPage() {
               />
             </div>
 
-            {/* Карточки с данными */}
             <section className="diagrams-item bg-card-light">
               <h3>Доходность по ТС</h3>
               <div
@@ -169,7 +176,6 @@ export default function AdminPage() {
                     }}
                     className="bg-card-light"
                   >
-                    {/* Первая строка: ID и тариф */}
                     <div 
                       style={{
                         display: "flex",
@@ -181,20 +187,17 @@ export default function AdminPage() {
                       <span style={{ color: "#00E5FF" }}>60 ₽/км</span>
                     </div>
 
-                    {/* Вторая и третья строки в общем контейнере */}
                     <div
                       style={{
                         display: "flex",
                         justifyContent: "space-between"
                       }}
                     >
-                      {/* Левый блок (пробег) */}
                       <div style={{ textAlign: "left" }}>
                         <div>Пробег:</div>
                         <div className="income-card__km">{item.km} км</div>
                       </div>
 
-                      {/* Правый блок (доход) */}
                       <div style={{ textAlign: "left", marginLeft: "auto" }}>
                         <div>Доход:</div>
                         <div className="income-card__income">{item.income.toLocaleString()} ₽</div>
@@ -213,7 +216,6 @@ export default function AdminPage() {
               flexDirection: "column",
             }}
           >
-            {/* Затраты */}
             <div className="card-container">
               <h3
                 style={{
@@ -271,7 +273,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* KPI блоки */}
             <div className="card-container">
               <h3
                 style={{
@@ -284,7 +285,6 @@ export default function AdminPage() {
                 <FaUserCog /> KPI сотрудников
               </h3>
             <div className="card-container kpi-container">
-              {/* Водители */}
               <div className="card ">
                 <h3
                   style={{
@@ -324,7 +324,6 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              {/* Механики */}
               <div className="card">
                 <h3
                   style={{
@@ -367,6 +366,7 @@ export default function AdminPage() {
             </div>
             </div>
           </div>
+           */}
         </div>
       </div>
     </>

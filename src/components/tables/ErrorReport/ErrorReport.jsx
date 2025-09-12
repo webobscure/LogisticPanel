@@ -113,43 +113,8 @@ export default function ErrorReport() {
         ) : (
           <UiTable
             columns={[
-              { header: "ФИО", render: (r) => r.fullName || "-" },
-              {
-                header: "Дата и время",
-                render: (r) => {
-                  const dt = new Date(r.create_dt);
-                  const day = String(dt.getDate()).padStart(2, "0");
-                  const month = String(dt.getMonth() + 1).padStart(2, "0");
-                  const year = dt.getFullYear();
-                  const hours = String(dt.getHours()).padStart(2, "0");
-                  const minutes = String(dt.getMinutes()).padStart(2, "0");
-                  return `${day}.${month}.${year} ${hours}:${minutes}`;
-                },
-              },
-              {
-                header: "Фотографии",
-                render: (r) => (
-                  <UiTableButton
-                    label={`${r.images?.length || 0} фото`}
-                    onClick={() => openPhotoGallery(r.images || [])}
-                    icon={FaImage}
-                  />
-                ),
-              },
-              {
-                header: "Документы",
-                render: (r) => r.documents?.join(", ") || "-",
-              },
-              {
-                header: "Действия",
-                render: (r) => (
-                  <UiTableButton
-                    label="Связаться"
-                    icon={FaPhone}
-                    href={`tel:${r.user?.phone}`}
-                  />
-                ),
-              },
+              { header: "ID", render: (r) => r.id},
+              { header: "Тип проблемы", render: (r) => r.report_type},
               {
                 header: "Статус",
                 render: (r) => (
@@ -159,7 +124,11 @@ export default function ErrorReport() {
                   </>
                 ),
               },
+              { header: "Заявитель", render: (r) => r.fullName || "Не назначен" },
+              { header: "Ответственный", render: (r) => r.resolver || "Не назначен" },
+
             ]}
+            
             data={visibleReports}
           />
         )}

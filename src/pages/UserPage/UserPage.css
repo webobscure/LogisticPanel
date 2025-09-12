@@ -45,6 +45,7 @@
   font-size: 0.95rem;
   background-color: #fff;
   box-sizing: border-box;
+  color: #000;
 }
 .filter-form .filter-container .ui-select {
   min-width: unset; /* убираем фиксированное ограничение */
@@ -57,6 +58,32 @@
     box-shadow: 0 0 6px rgba(74, 144, 226, 0.4);
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.2s;
+  color: #222;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* Адаптив */
 @media (max-width: 900px) {
