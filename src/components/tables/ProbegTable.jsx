@@ -63,7 +63,7 @@ export default function ProbegTable() {
           for (const item of mileageJson) {
             item.periods.forEach((period, i) => {
               allRows.push({
-                id: `${vehicle.id}-${i + 1}`,
+                id: `${i}`,
                 status: vehicle.status,
                 type: vehicle.type,
                 name: item.name || vehicle.brand || "-",
