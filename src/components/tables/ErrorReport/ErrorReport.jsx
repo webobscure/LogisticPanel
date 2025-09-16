@@ -31,7 +31,9 @@ export default function ErrorReport() {
 
         const formatted = data.map((report) => ({
           ...report,
-          fullName: report.user ? `${report.user.surname} ${report.user.name}` : "-",
+          fullName: report.user
+            ? `${report.user.surname} ${report.user.name}`
+            : "-",
           phone: report.user?.phone || "-",
         }));
         setReports(formatted);
@@ -79,7 +81,10 @@ export default function ErrorReport() {
               {
                 header: "ID",
                 render: (r) => (
-                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => openModal(r)}
+                  >
                     {r.id}
                   </div>
                 ),
@@ -87,7 +92,10 @@ export default function ErrorReport() {
               {
                 header: "Тип проблемы",
                 render: (r) => (
-                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => openModal(r)}
+                  >
                     {r.report_type}
                   </div>
                 ),
@@ -95,7 +103,10 @@ export default function ErrorReport() {
               {
                 header: "Статус",
                 render: (r) => (
-                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => openModal(r)}
+                  >
                     <FaCircle color={r.status ? "green" : "red"} /> {r.status}
                   </div>
                 ),
@@ -103,7 +114,10 @@ export default function ErrorReport() {
               {
                 header: "Заявитель",
                 render: (r) => (
-                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => openModal(r)}
+                  >
                     {r.fullName || "Не назначен"}
                   </div>
                 ),
@@ -111,7 +125,10 @@ export default function ErrorReport() {
               {
                 header: "Ответственный",
                 render: (r) => (
-                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => openModal(r)}
+                  >
                     {r.resolver || "Не назначен"}
                   </div>
                 ),
@@ -123,56 +140,110 @@ export default function ErrorReport() {
 
       {isModalOpen && selectedReport && (
         <UiModal title={`Заявка #${selectedReport.id}`} onClose={closeModal}>
-          <p><b>ID:</b> {selectedReport.id}</p>
-          <p><b>Тип проблемы:</b> {selectedReport.report_type}</p>
-          <p>
-            <b>Статус:</b>{" "}
-            <select value={selectedReport.status} onChange={handleStatusChange}>
-              <option value="new">Новая</option>
-              <option value="in_progress">В работе</option>
-              <option value="resolved">Решена</option>
-            </select>
-          </p>
-          <p>
-            <b>Заявитель:</b> {selectedReport.fullName}{" "}
+          <div className="modal-section">
+            <p>
+              <b>Тип проблемы:</b> {selectedReport.report_type}
+            </p>
+            <p>
+              <b>Статус:</b>{" "}
+              <span
+                className="status-indicator"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontWeight: 600,
+                }}
+              >
+                <FaCircle
+                  color={
+                    selectedReport.status === "resolved"
+                      ? "green"
+                      : selectedReport.status === "in_progress"
+                      ? "orange"
+                      : "red"
+                  }
+                />
+                {selectedReport.status === "resolved"
+                  ? "Решена"
+                  : selectedReport.status === "in_progress"
+                  ? "В работе"
+                  : "Новая"}
+              </span>
+            </p>
+          </div>
+
+          <div className="modal-section">
+            <p>
+              <b>Заявитель:</b> {selectedReport.fullName || "Не назначен"}
+            </p>
             {selectedReport.phone && (
-              <a href={`https://t.me/${selectedReport.phone}`} target="_blank" rel="noreferrer">
+              <a
+                href={`https://t.me/${selectedReport.phone}`}
+                target="_blank"
+                rel="noreferrer"
+                className="modal-link"
+              >
                 Telegram
               </a>
             )}
-          </p>
-          <p>
-            <b>Ответственный:</b> {selectedReport.resolver}{" "}
+          </div>
+
+          <div className="modal-section">
+            <p>
+              <b>Ответственный:</b> {selectedReport.resolver || "Не назначен"}
+            </p>
             {selectedReport.resolver && (
-              <a href={`https://t.me/${selectedReport.resolver}`} target="_blank" rel="noreferrer">
+              <a
+                href={`https://t.me/${selectedReport.resolver}`}
+                target="_blank"
+                rel="noreferrer"
+                className="modal-link"
+              >
                 Telegram
               </a>
             )}
-          </p>
-          <p><b>Сообщение:</b> {selectedReport.message}</p>
+          </div>
+
+          <div className="modal-section">
+            <p>
+              <b>Сообщение:</b>
+            </p>
+            <p className="modal-message">{selectedReport.message}</p>
+          </div>
 
           {selectedReport.photos?.length > 0 && (
-            <div>
-              <p><b>Фото:</b></p>
-              {selectedReport.photos.map((photo, i) => (
-                <img
-                  key={i}
-                  src={photo}
-                  alt={`Фото ${i}`}
-                  style={{ width: "100%", marginBottom: 10 }}
-                />
-              ))}
+            <div className="modal-section">
+              <p>
+                <b>Фото:</b>
+              </p>
+              <div className="modal-photos">
+                {selectedReport.photos.map((photo, i) => (
+                  <img
+                    key={i}
+                    src={photo}
+                    alt={`Фото ${i}`}
+                    className="modal-photo"
+                  />
+                ))}
+              </div>
             </div>
           )}
 
           {selectedReport.documents?.length > 0 && (
-            <div>
-              <p><b>Документы:</b></p>
-              {selectedReport.documents.map((doc, i) => (
-                <a key={i} href={doc.url} target="_blank" rel="noreferrer" style={{ display: "block" }}>
-                  {doc.name}
-                </a>
-              ))}
+            <div className="modal-section">
+              <p>
+                <b>Документы:</b>
+              </p>
+              <ul className="modal-documents">
+                {selectedReport.documents.map((doc, i) => (
+                  <li key={i}>
+                    <a href={doc.url} target="_blank" rel="noreferrer">
+                      {doc.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </UiModal>
