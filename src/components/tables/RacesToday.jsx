@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaMap, FaPlus } from "react-icons/fa";
 import UiSelect from "../ui/atoms/select";
 import UiTable from "../ui/atoms/table";
@@ -276,7 +276,7 @@ export default function RacesToday() {
     <div className="racestoday bg-card-light">
       <div className="racestoday-block">
         <h1>
-          <FaMap /> Рейсы на сегодня
+          <FaMap /> Список заказов (рейсов)
         </h1>
         <UiTableButton
           label="Добавить рейс"
