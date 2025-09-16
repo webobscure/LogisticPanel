@@ -6,6 +6,7 @@ import RacesToday from "../../components/tables/RacesToday";
 import NavPanel from "../../components/ui/organisms/NavPanel";
 import VehiclesTable from "../../components/tables/VehiclesTable";
 import { Header } from "../../components/ui/molecules/Header";
+import ErrorReport from "../../components/tables/ErrorReport/ErrorReport";
 
 export default function LogistPage() {
   const [donutSeries, setDonutSeries] = useState([0, 0, 0]);
@@ -91,7 +92,7 @@ export default function LogistPage() {
 
         <section className="diagrams">
           <ChartBlock />
-          <ChartBlock />
+          <ErrorReport />
         </section>
       </div>
     </div>
