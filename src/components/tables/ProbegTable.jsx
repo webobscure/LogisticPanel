@@ -142,7 +142,7 @@ export default function ProbegTable() {
               { header: "Пробег", render: (r) => r.mileage },
               {
                 header: "Глонасс",
-                render: (r) => (r.glonass_id ? <FaCheck /> : <FaTimes />),
+                render: (r) => (r.glonass_id ? <FaCheck color="green" /> : <FaTimes color="red" />),
               },
             ]}
             data={paginated}

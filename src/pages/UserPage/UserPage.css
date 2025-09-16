@@ -1,28 +1,26 @@
 /* Заголовок */
 .users-title {
-    font-weight: 600;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 15px;
-    user-select: none;
-}
-.title-text {
-    vertical-align: middle;
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: #222;
+  margin-bottom: 15px;
+  display: flex;
+  user-select: none;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .filter {
-    border-width: 1px;
+  border-width: 1px;
 }
 
-
-
 .shadow-sm {
-    --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
-    --tw-ring-offset-shadow: 0 0 #0000;
-    --tw-ring-shadow: 0 0 #0000;
-        border-color: hsl(var(--border));
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  border-color: hsl(var(--border));
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 /* Форма фильтра */
 .filter-form {
@@ -31,8 +29,8 @@
   gap: 16px;
   margin-bottom: 20px;
   user-select: none;
-  justify-content: start; 
-  max-width: 100%; 
+  justify-content: start;
+  max-width: 100%;
 }
 .filter-form .ui-select {
   max-width: 100%;
@@ -53,9 +51,9 @@
 }
 .filter-input:focus,
 .filter-select:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 6px rgba(74, 144, 226, 0.4);
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.4);
 }
 
 .pagination {
@@ -87,13 +85,13 @@
 
 /* Адаптив */
 @media (max-width: 900px) {
-    .filter-form {
-        flex-direction: column;
-    }
-    .filter-input,
-    .filter-select {
-        flex: 1 1 100%;
-    }
+  .filter-form {
+    flex-direction: column;
+  }
+  .filter-input,
+  .filter-select {
+    flex: 1 1 100%;
+  }
 }
 /* Для планшетов и меньших экранов — 2 колонки */
 @media (max-width: 768px) {
@@ -116,18 +114,15 @@
   .filter-select {
     flex: 1 1 calc(50% - 10px);
   }
-  }
+}
 
 /* Адаптив */
 @media (max-width: 425px) {
   .filter-form {
-      flex-direction: column;
+    flex-direction: column;
   }
   .filter-input,
   .filter-select {
-      flex: 1 1 100%;
+    flex: 1 1 100%;
   }
 }
-
-
-

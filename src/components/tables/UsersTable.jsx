@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch, FaUser } from "react-icons/fa";
+import { FaCheck , FaSearch, FaTimes, FaUser } from "react-icons/fa";
 import UiSelect from "../../components/ui/atoms/select";
 import UiTable from "../../components/ui/atoms/table";
 import Loader from "../../components/ui/molecules/Loader";
+import UiTableButton from "../ui/atoms/button";
 
 export default function UsersTable() {
   const API_URL = "https://dlm-agent.ru/api/v1";
@@ -78,39 +79,7 @@ export default function UsersTable() {
     setCurrentPage(1); // сброс на первую страницу при фильтрации
   };
 
-  const handleRoleChange = (userId, newRole) => {
-    const updatedUsers = users.map((user) =>
-      user.id === userId ? { ...user, userType: newRole } : user
-    );
-    setUsers(updatedUsers);
-    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
-  };
 
-  const handleVerificationToggle = (userId, verified) => {
-    const updatedUsers = users.map((user) =>
-      user.id === userId ? { ...user, verified } : user
-    );
-    setUsers(updatedUsers);
-    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
-  };
-  const handleActivenToggle = (userId, active) => {
-    const updatedUsers = users.map((user) =>
-      user.id === userId ? { ...user, active } : user
-    );
-    setUsers(updatedUsers);
-    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
-  };
-  const handleBanToggle = (userId) => {
-    const updatedUsers = users.map((user) => {
-      if (user.id === userId) {
-        const newBanned = !user.banned;
-        return { ...user, banned: newBanned, verified: !newBanned };
-      }
-      return user;
-    });
-    setUsers(updatedUsers);
-    setFilteredUsers(filterUsers(updatedUsers, searchFilters));
-  };
 
   // --- Загрузка всех пользователей с API ---
   useEffect(() => {
@@ -149,7 +118,7 @@ export default function UsersTable() {
           banned: u.is_banned,
           telephone: u.phone,
           nickname: u.telegram_nickname,
-          active: u.is_active
+          active: u.is_active,
         }));
 
         setUsers(formatted);
@@ -175,7 +144,7 @@ export default function UsersTable() {
   return (
     <div className="users">
       {/* Форма поиска */}
-      <div className="filter bg-card-light">
+      {/* <div className="filter bg-card-light">
         <div className="filter-title">
           <FaSearch /> Поиск пользователей
         </div>
@@ -230,7 +199,7 @@ export default function UsersTable() {
             className="filter-select"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Статусы загрузки / ошибки */}
       {loading && <Loader />}
@@ -243,13 +212,16 @@ export default function UsersTable() {
       {!loading && filteredUsers.length > 0 && (
         <div className="table-users bg-card-light">
           <div className="users-title">
-            <FaUser
+            
+            <span className="title-text">
+              <FaUser
               size={24}
               style={{ marginRight: 8, verticalAlign: "middle" }}
             />
-            <span className="title-text">
               Пользователи ({filteredUsers.length})
             </span>
+              <UiTableButton label="Добавить пользователя" />
+
           </div>
           <UiTable
             columns={[
@@ -274,57 +246,19 @@ export default function UsersTable() {
               },
               {
                 header: "Тг никнейм",
-                render: (u) => `${ u.nickname || 'Не подключен'}`,
+                render: (u) => `${u.nickname || "Не подключен"}`,
               },
               {
                 header: "Верификация",
-                render: (u) => (
-                  <>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={u.verified}
-                        onChange={(e) =>
-                          handleVerificationToggle(u.id, e.target.checked)
-                        }
-                      />
-                      <span className="slider" />
-                    </label>
-                    <span>{u.verified ? "Есть" : "Нет"}</span>
-                  </>
-                ),
+                render: (u) => (u.verified ? <FaCheck color="green" /> : <FaTimes color="red" />),
               },
               {
                 header: "Действия",
-                render: (u) => (
-                  <>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={u.banned}
-                        onChange={() => handleBanToggle(u.id)}
-                      />
-                      <span className="slider" />
-                    </label>
-                    <span>{u.banned ? "Верифицировать" : "Забанить"}</span>
-                  </>
-                ),
+                render: (u) => (u.banned ? <FaCheck color="green" /> : <FaTimes color="red" />),
               },
               {
                 header: "Активен",
-                render: (u) => (
-                  <>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={u.active}
-                        onChange={() => handleActivenToggle(u.id)}
-                      />
-                      <span className="slider" />
-                    </label>
-                    <span>{u.active ? "Активен" : "Оффлайн"}</span>
-                  </>
-                ),
+                render: (u) => (u.active ? <FaCheck color="green" /> : <FaTimes color="red" />),
               },
             ]}
             data={paginatedUsers}

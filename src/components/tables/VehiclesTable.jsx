@@ -83,7 +83,7 @@ export default function VehiclesTable() {
                 render: (r) => r.fullName || "Не назначен",
               },
               { header: "Пробег", render: (r) => r.mileage || "0" },
-              { header: "Глонасс", render: (r) => r.glonass_id ? <FaCheck /> : <FaTimes />  },
+              { header: "Глонасс", render: (r) => r.glonass_id ? <FaCheck color="green" /> : <FaTimes color="red" />  },
 
             ]}
             data={visibleVehicles}
