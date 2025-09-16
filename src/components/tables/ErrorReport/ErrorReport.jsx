@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { FaCircle, FaImage, FaPhone } from "react-icons/fa";
+import { FaCircle } from "react-icons/fa";
 import { FiAlertTriangle } from "react-icons/fi";
 import UiTable from "../../ui/atoms/table";
-import UiTableButton from "../../ui/atoms/button";
 import UiModal from "../../ui/atoms/modal";
 import Loader from "../../ui/molecules/Loader";
 
@@ -10,29 +9,10 @@ const API_URL = "https://dlm-agent.ru/api/v1";
 
 export default function ErrorReport() {
   const [reports, setReports] = useState([]);
-  const [selectedPhotos, setSelectedPhotos] = useState([]);
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [selectedReport, setSelectedReport] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Получаем ФИО пользователя по ID
-  const fetchUserInfo = async (userId) => {
-    if (!userId) return "-";
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await fetch(`${API_URL}/user?id=${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`Ошибка ${res.status}`);
-      const data = await res.json();
-      const user = data[0];
-      return user ? `${user.surname} ${user.name}` : "-";
-    } catch (err) {
-      console.error("Ошибка при загрузке пользователя:", err);
-      return "-";
-    }
-  };
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -43,29 +23,16 @@ export default function ErrorReport() {
 
         const res = await fetch(`${API_URL}/report/all`, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`Ошибка ${res.status}: ${text}`);
-        }
-
+        if (!res.ok) throw new Error(`Ошибка ${res.status}`);
         const data = await res.json();
 
-        // Добавляем полное имя пользователя
-        const formatted = data.map((report) => {
-          const fullName = report.user
-            ? `${report.user.surname} ${report.user.name}`
-            : "-";
-          const phone = report.user.phone
-          return { ...report, fullName, phone };
-        });
-        setReports(formatted);
-
+        const formatted = data.map((report) => ({
+          ...report,
+          fullName: report.user ? `${report.user.surname} ${report.user.name}` : "-",
+          phone: report.user?.phone || "-",
+        }));
         setReports(formatted);
       } catch (err) {
         setError(err.message);
@@ -73,27 +40,21 @@ export default function ErrorReport() {
         setLoading(false);
       }
     };
-
     fetchReports();
   }, []);
 
-  const openPhotoGallery = (photos) => {
-    if (photos?.length > 0) {
-      setSelectedPhotos(photos);
-      setCurrentPhotoIndex(0);
-      setIsModalOpen(true);
-    }
+  const openModal = (report) => {
+    setSelectedReport(report);
+    setIsModalOpen(true);
   };
 
-  const nextPhoto = () =>
-    setCurrentPhotoIndex((prev) => (prev + 1) % selectedPhotos.length);
-  const prevPhoto = () =>
-    setCurrentPhotoIndex(
-      (prev) => (prev - 1 + selectedPhotos.length) % selectedPhotos.length
-    );
   const closeModal = () => {
+    setSelectedReport(null);
     setIsModalOpen(false);
-    setSelectedPhotos([]);
+  };
+
+  const handleStatusChange = (e) => {
+    setSelectedReport({ ...selectedReport, status: e.target.value });
   };
 
   if (loading) return <Loader />;
@@ -112,39 +73,107 @@ export default function ErrorReport() {
           <p>Нет новых заявок о проблемах</p>
         ) : (
           <UiTable
+            data={visibleReports}
             columns={[
-              { header: "ID", render: (r) => r.id},
-              { header: "Тип проблемы", render: (r) => r.report_type},
+              {
+                header: "ID",
+                render: (r) => (
+                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                    {r.id}
+                  </div>
+                ),
+              },
+              {
+                header: "Тип проблемы",
+                render: (r) => (
+                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                    {r.report_type}
+                  </div>
+                ),
+              },
               {
                 header: "Статус",
                 render: (r) => (
-                  <>
-                    <FaCircle color={r.status ? "green" : "red"} />{" "}
-                    {r.status }
-                  </>
+                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                    <FaCircle color={r.status ? "green" : "red"} /> {r.status}
+                  </div>
                 ),
               },
-              { header: "Заявитель", render: (r) => r.fullName || "Не назначен" },
-              { header: "Ответственный", render: (r) => r.resolver || "Не назначен" },
-
+              {
+                header: "Заявитель",
+                render: (r) => (
+                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                    {r.fullName || "Не назначен"}
+                  </div>
+                ),
+              },
+              {
+                header: "Ответственный",
+                render: (r) => (
+                  <div style={{ cursor: "pointer" }} onClick={() => openModal(r)}>
+                    {r.resolver || "Не назначен"}
+                  </div>
+                ),
+              },
             ]}
-            
-            data={visibleReports}
           />
         )}
       </div>
 
-      {isModalOpen && (
-        <UiModal title="Фотографии" onClose={closeModal}>
-          <img
-            src={selectedPhotos[currentPhotoIndex]}
-            alt="Фото"
-            className="modal-photo"
-          />
-          <div className="modal-controls">
-            <UiTableButton label="Назад" onClick={prevPhoto} />
-            <UiTableButton label="Вперёд" onClick={nextPhoto} />
-          </div>
+      {isModalOpen && selectedReport && (
+        <UiModal title={`Заявка #${selectedReport.id}`} onClose={closeModal}>
+          <p><b>ID:</b> {selectedReport.id}</p>
+          <p><b>Тип проблемы:</b> {selectedReport.report_type}</p>
+          <p>
+            <b>Статус:</b>{" "}
+            <select value={selectedReport.status} onChange={handleStatusChange}>
+              <option value="new">Новая</option>
+              <option value="in_progress">В работе</option>
+              <option value="resolved">Решена</option>
+            </select>
+          </p>
+          <p>
+            <b>Заявитель:</b> {selectedReport.fullName}{" "}
+            {selectedReport.phone && (
+              <a href={`https://t.me/${selectedReport.phone}`} target="_blank" rel="noreferrer">
+                Telegram
+              </a>
+            )}
+          </p>
+          <p>
+            <b>Ответственный:</b> {selectedReport.resolver}{" "}
+            {selectedReport.resolver && (
+              <a href={`https://t.me/${selectedReport.resolver}`} target="_blank" rel="noreferrer">
+                Telegram
+              </a>
+            )}
+          </p>
+          <p><b>Сообщение:</b> {selectedReport.message}</p>
+
+          {selectedReport.photos?.length > 0 && (
+            <div>
+              <p><b>Фото:</b></p>
+              {selectedReport.photos.map((photo, i) => (
+                <img
+                  key={i}
+                  src={photo}
+                  alt={`Фото ${i}`}
+                  style={{ width: "100%", marginBottom: 10 }}
+                />
+              ))}
+            </div>
+          )}
+
+          {selectedReport.documents?.length > 0 && (
+            <div>
+              <p><b>Документы:</b></p>
+              {selectedReport.documents.map((doc, i) => (
+                <a key={i} href={doc.url} target="_blank" rel="noreferrer" style={{ display: "block" }}>
+                  {doc.name}
+                </a>
+              ))}
+            </div>
+          )}
         </UiModal>
       )}
     </div>
