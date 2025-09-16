@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from "react";
 import UiTable from "../ui/atoms/table";
 import { FaCashRegister } from "react-icons/fa";
+import UiTableButton from "../ui/atoms/button";
 
 export default function DriversSalaryTable() {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [filteredPayments, setFilteredPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-
-   // 🔹 Пагинация
-   const [currentPage, setCurrentPage] = useState(1);
-   const usersPerPage = 10;
+  // 🔹 Пагинация
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const API_URL = "https://dlm-agent.ru/api/v1";
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchPaymentsAndDrivers = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("accessToken");
         if (!token) throw new Error("Нет токена");
 
-        const res = await fetch(`${API_URL}/user-salary/drivers`, {
-          method: "GET",
+        // 1. Загружаем все выплаты
+        const res = await fetch(`${API_URL}/user-payment/all`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -37,32 +37,63 @@ export default function DriversSalaryTable() {
           throw new Error(`Ошибка ${res.status}: ${text}`);
         }
 
-        const data = await res.json();
+        const paymentsData = await res.json();
 
-        const formatted = data.map((u) => {
-          const fullName = `${u.surname || ""} ${u.name || ""} ${
-            u.patronymic || ""
-          }`.trim();
+        // 2. Собираем уникальные user_id
+        const uniqueUserIds = [...new Set(paymentsData.map((p) => p.user_id))];
 
-          const roles = Array.isArray(u.roles) ? u.roles.join(", ") : u.roles;
+        // 3. Загружаем пользователей
+        const userCache = new Map();
 
-          const totalSalary = u.salary
-            ? Object.values(u.salary)
-                .filter((val) => typeof val === "number")
-                .reduce((acc, val) => acc + val, 0)
-            : 0;
+        await Promise.all(
+          uniqueUserIds.map(async (id) => {
+            try {
+              const userRes = await fetch(`${API_URL}/user?id=${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (userRes.ok) {
+                const userArr = await userRes.json();
+                const user = userArr[0]; // ⚡ API возвращает массив
+                userCache.set(id, user);
+              }
+            } catch {
+              userCache.set(id, null);
+            }
+          })
+        );
 
-          return {
-            id: u.id,
-            fullName,
-            roles,
-            totalSalary,
-            date: u.salary?.date || null, // ⚡ сюда нужна дата из API
-          };
-        });
+        // 4. Оставляем только водителей
+        const merged = paymentsData
+          .map((p) => {
+            const user = userCache.get(p.user_id);
 
-        setUsers(formatted);
-        setFilteredUsers(formatted);
+            const hasDriverRole = Array.isArray(user?.roles)
+              ? user.roles.includes("Водитель")
+              : user?.roles === "Водитель";
+
+            if (!hasDriverRole) return null;
+
+            const fullName = user
+              ? `${user.surname || ""} ${user.name || ""} ${
+                  user.patronymic || ""
+                }`.trim()
+              : "—";
+
+            return {
+              id: p.id,
+              userId: p.user_id,
+              fullName,
+              roles: user?.roles?.join(", ") || "—",
+              amount: p.amount,
+              description: p.description,
+              date: p.create_dt,
+              vehicle: user?.vehicle?.state_number || "—",
+            };
+          })
+          .filter(Boolean);
+
+        setPayments(merged);
+        setFilteredPayments(merged);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -70,35 +101,36 @@ export default function DriversSalaryTable() {
       }
     };
 
-    fetchUsers();
+    fetchPaymentsAndDrivers();
   }, []);
 
   // 🔎 фильтр по дате
   useEffect(() => {
     if (!dateFrom && !dateTo) {
-      setFilteredUsers(users);
+      setFilteredPayments(payments);
       return;
     }
 
     const from = dateFrom ? new Date(dateFrom) : null;
     const to = dateTo ? new Date(dateTo) : null;
 
-    const filtered = users.filter((u) => {
-      if (!u.date) return false;
-      const d = new Date(u.date);
+    const filtered = payments.filter((p) => {
+      if (!p.date) return false;
+      const d = new Date(p.date);
       if (from && d < from) return false;
       if (to && d > to) return false;
       return true;
     });
 
-    setFilteredUsers(filtered);
-  }, [dateFrom, dateTo, users]);
-// --- Пагинация ---
-const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-const paginatedUsers = filteredUsers.slice(
-  (currentPage - 1) * usersPerPage,
-  currentPage * usersPerPage
-);
+    setFilteredPayments(filtered);
+  }, [dateFrom, dateTo, payments]);
+
+  // --- Пагинация ---
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
+  const paginated = filteredPayments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="errorreport bg-card-light">
@@ -125,48 +157,54 @@ const paginatedUsers = filteredUsers.slice(
       <div className="errorreport-table">
         {loading && <p>Загрузка...</p>}
         {error && <p style={{ color: "red" }}>Ошибка: {error}</p>}
-        {!loading && filteredUsers.length === 0 ? (
+        {!loading && filteredPayments.length === 0 ? (
           <p>Нет данных</p>
         ) : (
           <UiTable
             columns={[
-              { header: "ID", render: (u) => u.id },
-              { header: "ФИО", render: (u) => u.fullName || "—" },
-              { header: "Роли", render: (u) => u.roles || "—" },
-              {
-                header: "Выплачено за период",
-                render: (u) => `${u.totalSalary} ₽`,
-              },
-             
+              { header: "ID юзера", render: (p) => p.userId },
+              { header: "ФИО", render: (p) => p.fullName },
+              { header: "Роли", render: (p) => p.roles },
+              { header: "Авто", render: (p) => p.vehicle },
+              { header: "Сумма", render: (p) => `${p.amount} ₽` },
+              // {
+              //   header: "Дата",
+              //   render: (p) => new Date(p.date).toLocaleString("ru-RU"),
+              // },
             ]}
-            data={paginatedUsers}
+            data={paginated}
           />
-          
         )}
         {/* 🔹 Пагинация */}
         <div className="pagination">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            Назад
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
             <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
+              key={i}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
             >
-              Назад
+              {i + 1}
             </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i}
-                className={currentPage === i + 1 ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-            >
-              Вперёд
-            </button>
-          </div>
+          ))}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            Вперёд
+          </button>
+        </div>
+        <div className="button-top">
+                <UiTableButton
+                              label="Скачать Excel"
+                              style={{ width: "100%", margin: "0 auto" }}
+                            />
+              </div>
       </div>
     </div>
   );

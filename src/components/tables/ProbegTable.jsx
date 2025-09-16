@@ -1,68 +1,85 @@
 import React, { useEffect, useState } from "react";
 import UiTable from "../ui/atoms/table";
-import { FaCashRegister } from "react-icons/fa";
+import { FaCashRegister, FaCheck, FaTimes, FaCircle } from "react-icons/fa";
+import UiTableButton from "../ui/atoms/button";
 
 export default function ProbegTable() {
-  const [users, setUsers] = useState([]);
-  const [visibleVehicles, setVisibleVehicles] = useState([]);
+  const [data, setData] = useState([]);
+  const [visibleData, setVisibleData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState("2025-09-10");
+  const [dateTo, setDateTo] = useState("2025-09-22");
 
-
-   // 🔹 Пагинация
-   const [currentPage, setCurrentPage] = useState(1);
-   const usersPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const perPage = 10;
 
   const API_URL = "https://dlm-agent.ru/api/v1";
 
+  const formatDate = (date, endOfDay = false) => {
+    if (!date) return null;
+    const d = new Date(date);
+    if (endOfDay) {
+      d.setHours(23, 59, 59, 999);
+    } else {
+      d.setHours(0, 0, 0, 0);
+    }
+    const iso = d.toISOString();
+    const [datePart, timePart] = iso.replace("Z", "").split("T");
+    const [hh, mm, ssMs] = timePart.split(":");
+    const [ss, ms] = ssMs.split(".");
+    return `${datePart}T${hh}:${mm}:${ss}.${ms.padEnd(6, "0")}`;
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("accessToken");
         if (!token) throw new Error("Нет токена");
 
-        const res = await fetch(`${API_URL}/glonass/vehicle-mileage`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const from = formatDate(dateFrom, false);
+        const to = formatDate(dateTo, true);
 
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`Ошибка ${res.status}: ${text}`);
+        // 1. Загружаем список машин
+        const vehiclesRes = await fetch(`${API_URL}/vehicle/all`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const vehicles = await vehiclesRes.json();
+
+        // 2. Загружаем пробег по каждому glonass_id
+        const allRows = [];
+
+        for (const vehicle of vehicles) {
+          if (!vehicle.glonass_id) continue;
+
+          const mileageRes = await fetch(
+            `${API_URL}/glonass/vehicle-mileage?vehicle_id=${vehicle.glonass_id}&from_datetime=${from}&to_datetime=${to}&sampling_interval=86400`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const mileageJson = await mileageRes.json();
+
+          // mileageJson → [{ vehicleId, name, periods: [...] }]
+          for (const item of mileageJson) {
+            item.periods.forEach((period, i) => {
+              allRows.push({
+                id: `${vehicle.id}-${i + 1}`,
+                status: vehicle.status,
+                type: vehicle.type,
+                name: item.name || vehicle.brand || "-",
+                state_number: vehicle.state_number || "-",
+                driver: vehicle.user
+                  ? `${vehicle.user.name} ${vehicle.user.surname}`
+                  : "-",
+                mileage: period.mileage,
+                glonass_id: vehicle.glonass_id,
+              });
+            });
+          }
         }
 
-        const data = await res.json();
-
-        const formatted = data.map((u) => {
-          const fullName = `${u.surname || ""} ${u.name || ""} ${
-            u.patronymic || ""
-          }`.trim();
-
-          const roles = Array.isArray(u.roles) ? u.roles.join(", ") : u.roles;
-
-          const totalSalary = u.salary
-            ? Object.values(u.salary)
-                .filter((val) => typeof val === "number")
-                .reduce((acc, val) => acc + val, 0)
-            : 0;
-
-          return {
-            id: u.id,
-            fullName,
-            roles,
-            totalSalary,
-            date: u.salary?.date || null, // ⚡ сюда нужна дата из API
-          };
-        });
-
-        setUsers(formatted);
-        setVisibleVehicles(formatted);
+        setData(allRows);
+        setVisibleData(allRows);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -70,35 +87,14 @@ export default function ProbegTable() {
       }
     };
 
-    fetchUsers();
-  }, []);
+    fetchData();
+  }, [dateFrom, dateTo]);
 
-  // 🔎 фильтр по дате
-  useEffect(() => {
-    if (!dateFrom && !dateTo) {
-        setVisibleVehicles(users);
-      return;
-    }
-
-    const from = dateFrom ? new Date(dateFrom) : null;
-    const to = dateTo ? new Date(dateTo) : null;
-
-    const filtered = users.filter((u) => {
-      if (!u.date) return false;
-      const d = new Date(u.date);
-      if (from && d < from) return false;
-      if (to && d > to) return false;
-      return true;
-    });
-
-    setVisibleVehicles(filtered);
-  }, [dateFrom, dateTo, users]);
-// --- Пагинация ---
-const totalPages = Math.ceil(visibleVehicles.length / usersPerPage);
-const paginatedUsers = visibleVehicles.slice(
-  (currentPage - 1) * usersPerPage,
-  currentPage * usersPerPage
-);
+  const totalPages = Math.ceil(visibleData.length / perPage);
+  const paginated = visibleData.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage
+  );
 
   return (
     <div className="errorreport bg-card-light">
@@ -106,7 +102,6 @@ const paginatedUsers = visibleVehicles.slice(
         <FaCashRegister /> Пробег за период
       </div>
 
-      {/* фильтр по дате */}
       <div className="filter-form user-form" style={{ marginBottom: "20px" }}>
         <input
           type="date"
@@ -125,59 +120,64 @@ const paginatedUsers = visibleVehicles.slice(
       <div className="errorreport-table">
         {loading && <p>Загрузка...</p>}
         {error && <p style={{ color: "red" }}>Ошибка: {error}</p>}
-        {!loading && visibleVehicles.length === 0 ? (
+        {!loading && paginated.length === 0 ? (
           <p>Нет данных</p>
         ) : (
-            <UiTable
+          <UiTable
             columns={[
               { header: "ID", render: (r) => r.id },
               {
                 header: "Статус",
                 render: (r) => (
                   <>
-                    <FaCircle color={r.status ? "green" : "red"} /> {r.status}
+                    <FaCircle color={r.status === "Активна" ? "green" : "red"} />{" "}
+                    {r.status}
                   </>
                 ),
               },
-              { header: "Тип ", render: (r) => r.type },
-              { header: "Название ", render: (r) => r.name || "-" },
-              { header: "Номер", render: (r) => r.state_number || "-" },
+              { header: "Тип", render: (r) => r.type },
+              { header: "Название", render: (r) => r.name },
+              { header: "Номер", render: (r) => r.state_number },
+              { header: "Водитель", render: (r) => r.driver },
+              { header: "Пробег", render: (r) => r.mileage },
               {
-                header: "Водитель",
-                render: (r) => r.fullName || "Не назначен",
+                header: "Глонасс",
+                render: (r) => (r.glonass_id ? <FaCheck /> : <FaTimes />),
               },
-              { header: "Пробег", render: (r) => r.mileage || "0" },
-              { header: "Глонасс", render: (r) => r.glonass_id ? <FaCheck /> : <FaTimes />  },
-
             ]}
-            data={visibleVehicles}
+            data={paginated}
           />
-          
         )}
-        {/* 🔹 Пагинация */}
+
         <div className="pagination">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            Назад
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
             <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
+              key={i}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
             >
-              Назад
+              {i + 1}
             </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i}
-                className={currentPage === i + 1 ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-            >
-              Вперёд
-            </button>
-          </div>
+          ))}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            Вперёд
+          </button>
+        </div>
+        <div className="button-top">
+                <UiTableButton
+                              label="Скачать Excel"
+                              style={{ width: "100%", margin: "0 auto" }}
+                            />
+              </div>
       </div>
     </div>
   );

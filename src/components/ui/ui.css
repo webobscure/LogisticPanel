@@ -239,6 +239,9 @@
 }
 
 /* Кнопка внизу */
+.button-top {
+  margin-top: 10px;
+}
 .ui-table-button {
   max-width: 200px;
   padding: 14px 0;
