@@ -103,7 +103,7 @@ const paginatedUsers = visibleVehicles.slice(
   return (
     <div className="errorreport bg-card-light">
       <div className="errorreport-title">
-        <FaCashRegister /> Зарплата водителей
+        <FaCashRegister /> Пробег за период
       </div>
 
       {/* фильтр по дате */}
