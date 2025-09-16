@@ -1,37 +1,49 @@
 .four .card {
-    width: 25%;
+  width: 25%;
 }
 
 .card-detail-descr {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 .racestoday-block {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 .racestoday-block h1 {
-    font-size: 1.5em;
+  font-size: 1.5em;
 }
 .racestoday-block button {
-    max-height: 40px;
+  max-height: 40px;
 }
 .text-primary {
-    color: #222;
-    font-weight: 600;
+  color: #222;
+  font-weight: 600;
 }
 .racestoday-filter {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
-.racestoday-filter h1, .errorreport-title {
-    font-size: 1.5em;
+.racestoday-filter h1,
+.errorreport-title {
+  font-size: 1.5em;
 }
 
 .errorreport-title {
-    text-align: left;
+  text-align: left;
+}
+
+.logist-panel__bottom-block {
+  height: max-content;
+}
+
+.logist-panel__bottom-block
+.logist-panel__bottom-item {
+  width: calc(50% - 60px);
+  min-height: 365px;
+  height: inherit;
 }

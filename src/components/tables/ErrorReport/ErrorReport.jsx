@@ -102,7 +102,7 @@ export default function ErrorReport() {
   const visibleReports = reports.filter((report) => !report.resolved);
 
   return (
-    <div className="errorreport bg-card-light">
+    <div className="errorreport bg-card-light logist-panel__bottom-item">
       <div className="errorreport-title">
         <FiAlertTriangle /> Заявки о проблеме
       </div>
