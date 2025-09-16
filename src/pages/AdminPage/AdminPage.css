@@ -111,7 +111,7 @@ body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    /* justify-content: space-between; */
+    justify-content: space-between;
 }
 .diagrams-item {
     width: calc(50% - 60px);

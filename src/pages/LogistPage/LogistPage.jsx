@@ -90,9 +90,9 @@ export default function LogistPage() {
         <RacesToday />
         <VehiclesTable />
 
-        <section className="diagrams">
-          <ChartBlock />
+        <section className="diagrams logist-panel__bottom-block">
           <ErrorReport />
+          <ChartBlock />
         </section>
       </div>
     </div>
