@@ -154,20 +154,8 @@ export default function ErrorReport() {
                   fontWeight: 600,
                 }}
               >
-                <FaCircle
-                  color={
-                    selectedReport.status === "resolved"
-                      ? "green"
-                      : selectedReport.status === "in_progress"
-                      ? "orange"
-                      : "red"
-                  }
-                />
-                {selectedReport.status === "resolved"
-                  ? "Решена"
-                  : selectedReport.status === "in_progress"
-                  ? "В работе"
-                  : "Новая"}
+                <FaCircle color={selectedReport.status ? "green" : "red"} />
+                {selectedReport.status ? selectedReport.status : "Новая"}
               </span>
             </p>
           </div>
