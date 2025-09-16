@@ -4,7 +4,6 @@ import { FiAlertTriangle } from "react-icons/fi";
 import UiTable from "../../ui/atoms/table";
 import UiModal from "../../ui/atoms/modal";
 import Loader from "../../ui/molecules/Loader";
-import UiSelect from "../../ui/atoms/select";
 
 const API_URL = "https://dlm-agent.ru/api/v1";
 

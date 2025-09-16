@@ -360,6 +360,9 @@
   user-select: none;
   margin-top: 1rem;
 }
+.ui-table td {
+  cursor: pointer;
+}
 .ui-table th,
 .ui-table td {
   padding: 14px 18px;
