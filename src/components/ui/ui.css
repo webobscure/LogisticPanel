@@ -1,17 +1,16 @@
+/* --- UI SELECT --- */
 .ui-select {
-  appearance: none; /* Убираем стандартную стрелку */
+  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   background-color: #fff;
   border-radius: 20px;
-  padding: 8px 38px 8px 14px; /* Оставляем место справа под стрелку */
+  padding: 8px 38px 8px 14px;
   font-size: 14px;
   font-family: Arial, sans-serif;
   color: #333;
   cursor: pointer;
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
   outline: none;
   position: relative;
   width: 169px;
@@ -19,20 +18,12 @@
   box-sizing: border-box;
   border: 1px solid #005fcc;
   max-width: 310px;
-}
-
-/* Кастомная стрелка через псевдоэлемент */
-.ui-select {
   background-image: linear-gradient(45deg, transparent 50%, #555 50%),
     linear-gradient(135deg, #555 50%, transparent 50%), linear-gradient(to right, #ccc, #ccc);
-  background-position:
-    calc(100% - 25px) calc(50% - 6px),
+  background-position: calc(100% - 25px) calc(50% - 6px),
     calc(100% - 20px) calc(50% - 6px),
     calc(100% - 25px) 50%;
-  background-size:
-    7px 7px,
-    7px 7px,
-    1px 14px;
+  background-size: 7px 7px, 7px 7px, 1px 14px;
   background-repeat: no-repeat;
 }
 
@@ -43,10 +34,8 @@
 .ui-select:focus {
   border-color: #005fcc;
   box-shadow: 0 0 5px rgba(0, 95, 204, 0.5);
-  outline: none;
 }
 
-/* Для disabled */
 .ui-select:disabled {
   background-color: #f5f5f5;
   color: #999;
@@ -54,217 +43,6 @@
   border-color: #ddd;
 }
 
-.filter-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.filter-container h1 {
-  font-size: 0.875rem !important;
-}
-/* Модальное окно */
-.ui-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.ui-modal {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  max-width: 480px;
-  width: 90%;
-  padding: 30px 40px;
-  position: relative;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #222;
-  animation: modalFadeIn 0.25s ease forwards;
-}
-
-.ui-modal-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: #1a237e;
-  text-align: center;
-  letter-spacing: 0.05em;
-}
-
-.ui-modal-content p {
-  margin: 12px 0;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.ui-modal-content p strong {
-  display: inline-block;
-  min-width: 130px;
-  color: #3949ab;
-}
-
-.ui-modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  font-size: 22px;
-  font-weight: 700;
-  color: #666;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.ui-modal-close:hover {
-  color: #f44336;
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.details-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #222;
-  max-width: 480px;
-  width: 100%;
-}
-.details-section {
-  margin-bottom: 28px;
-}
-
-.details-section-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 16px;
-  border-bottom: 2px solid #90caf9;
-  padding-bottom: 6px;
-  user-select: none;
-}
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px 32px;
-}
-
-.details-item label,
-.details-block label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #555;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.details-item p,
-.details-block p {
-  font-size: 1rem;
-  margin: 0;
-  color: #111;
-}
-
-.details-block {
-  /* занимает всю ширину */
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 4px 14px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #1565c0;
-  background-color: #bbdefb;
-  border: 1px solid #90caf9;
-  border-radius: 9999px;
-  margin-top: 6px;
-  user-select: none;
-}
-/* Модалка на добавление */
-/* Контейнер формы */
-.modal-form {
-  display: grid;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-/* Общие стили для input и textarea */
-.modal-form input,
-.modal-form textarea {
-  padding: 10px 14px;
-  font-size: 1rem;
-  border: 1.8px solid #ccc;
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #222;
-  resize: vertical; /* textarea можно изменять по высоте */
-  outline-offset: 2px;
-  background: #fff;
-  border: 1px solid #4a90e2;
-}
-
-.modal-form input:focus,
-.modal-form textarea:focus {
-  border-color: #3f51b5;
-  box-shadow: 0 0 5px rgba(63, 81, 181, 0.5);
-  outline: none;
-}
-
-/* Высота textarea, можно менять */
-.modal-form textarea {
-  min-height: 80px;
-}
-
-/* Для input type="date" и datetime-local — сделаем чуть больше высоту */
-.modal-form input[type="date"],
-.modal-form input[type="datetime-local"] {
-  padding-top: 11px;
-  padding-bottom: 11px;
-}
-
-/* Кнопка внизу */
-.button-top {
-  margin-top: 10px;
-}
-.ui-table-button {
-  max-width: 200px;
-  padding: 14px 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 10px;
-  background-color: #3f51b5;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-}
-.racestoday .filter-container {
-  width: 100%;
-}
-.ui-modal-content .ui-table-button {
-  margin: 0 auto;
-}
-.ui-table-button:hover {
-  background-color: #303f9f;
-  color: #fff;
-}
-/* Select */
 .ui-select-container {
   display: inline-block;
   max-width: 280px;
@@ -284,21 +62,6 @@
   width: 100%;
 }
 
-/* Скрываем нативную стрелку */
-
-
-.ui-select:hover {
-  border-color: #3498db;
-}
-
-.ui-select:focus {
-  outline: none;
-  border-color: #005fcc;
-  box-shadow: 0 0 6px #005fccaa;
-  background-color: #e0f7f1;
-}
-
-/* Кастомная стрелка */
 .ui-select-wrapper::after {
   content: "";
   pointer-events: none;
@@ -314,20 +77,60 @@
   transition: border-color 0.25s ease;
 }
 
-.ui-select:hover + .ui-select-wrapper::after,
-.ui-select:focus + .ui-select-wrapper::after {
-  border-color: #005fcc;
-}
-
-/* Исправляем селектор для стрелки — она внутри .ui-select-wrapper */
 .ui-select-wrapper:hover::after,
 .ui-select-wrapper:focus-within::after {
   border-color: #005fcc;
 }
 
+/* --- TABLE --- */
+.ui-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  user-select: none;
+  margin-top: 1rem;
+}
 
-/* Кнопка */
+.ui-table th,
+.ui-table td {
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 0.95rem;
+}
 
+.ui-table thead {
+  background-color: #4a90e2;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ui-table tbody tr {
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+  cursor: default;
+}
+
+.ui-table tbody tr:nth-child(even) {
+  background-color: #f8faff;
+}
+
+.ui-table tbody tr:hover {
+  background-color: #e1e9fc;
+}
+
+.ui-table td {
+  cursor: pointer;
+}
+
+.banned-row {
+  background-color: #ffebee !important;
+  color: #a94442;
+}
+
+/* --- BUTTONS --- */
 .ui-table-button {
   display: inline-flex;
   align-items: center;
@@ -350,194 +153,196 @@
   font-size: 14px;
 }
 
-/* Таблица */
-.ui-table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-  user-select: none;
-  margin-top: 1rem;
-}
-.ui-table td {
-  cursor: pointer;
-}
-.ui-table th,
-.ui-table td {
-  padding: 14px 18px;
-  text-align: center;
-  font-size: 0.95rem;
-}
-.ui-table thead {
-  background-color: #4a90e2;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-}
-.ui-table tbody tr {
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s ease;
-  cursor: default;
-}
-.ui-table tbody tr:nth-child(even) {
-  background-color: #f8faff;
-}
-.ui-table tbody tr:hover {
-  background-color: #e1e9fc;
-}
-.banned-row {
-  background-color: #ffebee !important;
-  color: #a94442;
-}
-
-/* Role select */
-.role-select {
-  padding: 8px 10px;
-  border-radius: 5px;
-  border: 1.3px solid #ccc;
-  font-size: 0.9rem;
-  background-color: #fefefe;
-  transition: border-color 0.3s ease;
-  cursor: pointer;
-}
-.role-select:hover {
-  border-color: #4a90e2;
-}
-.role-select:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
-}
-/* --- MODAL --- */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* затемнение */
+/* --- FILTER --- */
+.filter-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 9999; /* поверх всего */
+  gap: 1rem;
 }
 
-.modal-content {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-  position: relative;
-  animation: fadeIn 0.2s ease;
+.filter-container h1 {
+  font-size: 0.875rem !important;
 }
 
-.modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-}
-
-.modal-content form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal-content input {
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.modal-content button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.modal-content button[type="submit"] {
-  background: #007bff;
-  color: white;
-}
-
-.modal-content button[type="button"] {
-  background: #e0e0e0;
-}
-
-.modal-close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  cursor: pointer;
-  font-size: 18px;
-  color: #555;
-}
-
-/* Verification checkbox */
-.verification-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-/* Кастомный тумблер */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  vertical-align: middle;
-  margin-right: 10px;
-}
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  border-radius: 24px;
-  transition: 0.4s;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
-}
-.switch input:checked + .slider {
-  background-color: #4a90e2;
-}
-.switch input:checked + .slider:before {
-  transform: translateX(20px);
-}
-
-.action-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  user-select: none;
-}
-.action-label {
-  color: #555;
-}
 .filter-title {
   text-align: left;
   margin-bottom: 1rem;
+}
+
+/* --- MODAL UNIVERSAL --- */
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.ui-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 650px;
+  padding: 24px 32px;
+  position: relative;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+  animation: modalFadeIn 0.3s ease forwards;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ui-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ui-modal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a237e;
+  text-align: center;
+  flex: 1;
+}
+
+.ui-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  font-weight: 700;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.ui-modal-close:hover {
+  color: #f44336;
+}
+
+.ui-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.modal-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 24px;
+}
+
+.modal-section label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.modal-section input,
+.modal-section select,
+.modal-section textarea {
+  padding: 10px 14px;
+  font-size: 1rem;
+  border: 1.5px solid #4a90e2;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-section input:focus,
+.modal-section select:focus,
+.modal-section textarea:focus {
+  border-color: #3f51b5;
+  box-shadow: 0 0 6px rgba(63, 81, 181, 0.4);
+  outline: none;
+}
+
+.modal-section textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.modal-actions button.save {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.modal-actions button.save:hover {
+  background-color: #357ab8;
+}
+
+.modal-actions button.confirm {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.modal-actions button.confirm:hover {
+  background-color: #1e7e34;
+}
+
+.modal-actions button.cancel {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.modal-actions button.cancel:hover {
+  background-color: #bdbdbd;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .ui-modal {
+    padding: 20px 16px;
+  }
+  .modal-section {
+    grid-template-columns: 1fr;
+  }
+  .ui-modal-title {
+    font-size: 1.5rem;
+  }
+  .modal-actions {
+    justify-content: center;
+  }
+}
+
+/* --- ANIMATION --- */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
