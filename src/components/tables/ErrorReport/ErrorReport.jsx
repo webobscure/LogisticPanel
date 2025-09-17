@@ -14,6 +14,10 @@ export default function ErrorReport() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // пагинация
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
   useEffect(() => {
     const fetchReports = async () => {
       try {
@@ -60,6 +64,14 @@ export default function ErrorReport() {
 
   const visibleReports = reports.filter((report) => !report.resolved);
 
+  // пагинация
+  const totalPages = Math.ceil(visibleReports.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReports = visibleReports.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   return (
     <div className="errorreport bg-card-light logist-panel__bottom-item">
       <div className="errorreport-title">
@@ -67,11 +79,11 @@ export default function ErrorReport() {
       </div>
 
       <div className="errorreport-table">
-        {visibleReports.length === 0 ? (
+        {paginatedReports.length === 0 ? (
           <p>Нет новых заявок о проблемах</p>
         ) : (
           <UiTable
-            data={visibleReports}
+            data={paginatedReports}
             columns={[
               { header: "ID", render: (r) => r.id },
               { header: "Тип проблемы", render: (r) => r.report_type },
@@ -87,11 +99,48 @@ export default function ErrorReport() {
               { header: "Заявитель", render: (r) => r.fullName || "Не назначен" },
               { header: "Ответственный", render: (r) => r.resolver || "Не назначен" },
             ]}
-            onRowClick={(row) => openModal(row)} // 🔹 теперь клик по строке
+            onRowClick={(row) => openModal(row)}
             rowStyle={{ cursor: "pointer" }}
           />
         )}
       </div>
+
+      {/* пагинация */}
+      {totalPages > 1 && (
+        <div className="pagination" style={{ display: "flex", gap: "12px", alignItems: "center", marginTop: "10px" }}>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            ⬅️ Назад
+          </button>
+          <span>
+            Страница {currentPage} из {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            Вперёд ➡️
+          </button>
+
+          {/* выбор количества на страницу */}
+          <label>
+            Показывать по:{" "}
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // сбрасываем на первую страницу
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+          </label>
+        </div>
+      )}
 
       {isModalOpen && selectedReport && (
         <UiModal title={`Заявка #${selectedReport.id}`} onClose={closeModal}>
