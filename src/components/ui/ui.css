@@ -409,6 +409,72 @@
   border-color: #4a90e2;
   box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
 }
+/* --- MODAL --- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* затемнение */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* поверх всего */
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-content input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.modal-content button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-content button[type="submit"] {
+  background: #007bff;
+  color: white;
+}
+
+.modal-content button[type="button"] {
+  background: #e0e0e0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+}
 
 /* Verification checkbox */
 .verification-checkbox {

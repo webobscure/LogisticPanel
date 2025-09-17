@@ -63,7 +63,11 @@
   margin-top: 16px;
   gap: 10px;
 }
-
+.users-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
 .pagination button {
   padding: 6px 12px;
   border: 1px solid #ddd;
@@ -125,4 +129,9 @@
   .filter-select {
     flex: 1 1 100%;
   }
+}
+
+
+.ui-modal-content .ui-table-button {
+  margin: 0;
 }
