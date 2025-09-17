@@ -15,6 +15,8 @@ export default function VehiclesPage() {
   const [originalData, setOriginalData] = useState({});
   const [saving, setSaving] = useState(false);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     const fetchReports = async () => {
       try {
@@ -52,12 +54,14 @@ export default function VehiclesPage() {
     setSelectedVehicle(vehicle);
     setFormData(JSON.parse(JSON.stringify(vehicle)));
     setOriginalData(JSON.parse(JSON.stringify(vehicle)));
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedVehicle(null);
     setFormData({});
     setOriginalData({});
+    setIsModalOpen(false);
   };
 
   const setField = (path, value) => {
@@ -70,7 +74,8 @@ export default function VehiclesPage() {
       const next = { ...prev };
       let cur = next;
       for (let i = 0; i < keys.length - 1; i++) {
-        if (!cur[keys[i]] || typeof cur[keys[i]] !== "object") cur[keys[i]] = {};
+        if (!cur[keys[i]] || typeof cur[keys[i]] !== "object")
+          cur[keys[i]] = {};
         cur = cur[keys[i]];
       }
       cur[keys[keys.length - 1]] = value;
@@ -78,7 +83,6 @@ export default function VehiclesPage() {
     });
   };
 
-  // Получаем только измененные поля
   const getChangedFields = () => {
     const changed = {};
     const compare = (orig, current, prefix = "") => {
@@ -94,7 +98,7 @@ export default function VehiclesPage() {
       });
     };
     compare(originalData, formData);
-    changed.id = formData.id; // id обязателен
+    changed.id = formData.id;
     return changed;
   };
 
@@ -107,7 +111,6 @@ export default function VehiclesPage() {
 
       const changedFields = getChangedFields();
 
-      // Формируем query-параметры
       const query = new URLSearchParams();
       Object.entries(changedFields).forEach(([key, value]) => {
         query.append(key, value);
@@ -126,7 +129,9 @@ export default function VehiclesPage() {
       const updated = await res.json();
       const updatedWithHelpers = {
         ...updated,
-        fullName: updated.user ? `${updated.user.surname} ${updated.user.name}` : "-",
+        fullName: updated.user
+          ? `${updated.user.surname} ${updated.user.name}`
+          : "-",
         phone: updated.user?.phone || "",
       };
 
@@ -157,47 +162,171 @@ export default function VehiclesPage() {
         <UiTable
           data={reports}
           columns={[
-            { header: "ID", render: (r) => <span onClick={() => openModal(r)}>{r.id}</span> },
+            { header: "ID", render: (r) => r.id },
             {
               header: "Статус",
               render: (r) => (
-                <span onClick={() => openModal(r)}>
-                  <FaCircle color={r.status === "Активна" ? "green" : "red"} /> {r.status}
-                </span>
+                <>
+                  <FaCircle
+                    color={r.status === "Активна" ? "green" : "red"}
+                  />{" "}
+                  {r.status}
+                </>
               ),
             },
-            { header: "Тип", render: (r) => <span onClick={() => openModal(r)}>{r.type || "-"}</span> },
-            { header: "Название", render: (r) => <span onClick={() => openModal(r)}>{r.name || r.brand || "-"}</span> },
-            { header: "Номер", render: (r) => <span onClick={() => openModal(r)}>{r.state_number || "-"}</span> },
-            { header: "Водитель", render: (r) => <span onClick={() => openModal(r)}>{r.fullName || "-"}</span> },
-            { header: "Пробег", render: (r) => <span onClick={() => openModal(r)}>{r.mileage ?? "-"}</span> },
-            { header: "Глонасс", render: (r) => r.glonass_id ? <FaCheck color="green" onClick={() => openModal(r)} /> : <FaTimes color="red" onClick={() => openModal(r)} /> },
+            { header: "Тип", render: (r) => r.type || "-" },
+            { header: "Название", render: (r) => r.name || r.brand || "-" },
+            { header: "Номер", render: (r) => r.state_number || "-" },
+            { header: "Водитель", render: (r) => r.fullName || "-" },
+            { header: "Пробег", render: (r) => r.mileage ?? "-" },
+            {
+              header: "Глонасс",
+              render: (r) =>
+                r.glonass_id ? (
+                  <FaCheck color="green" />
+                ) : (
+                  <FaTimes color="red" />
+                ),
+            },
           ]}
+          onRowClick={(row) => openModal(row)} // 🔹 кликаем по строке
+          rowStyle={{ cursor: "pointer" }}
         />
       )}
 
-      {selectedVehicle && (
-        <UiModal title={`Транспорт #${selectedVehicle.id}`} onClose={closeModal}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <label>Марка <input value={formData.brand ?? ""} onChange={(e) => setField("brand", e.target.value)} /></label>
-            <label>Название <input value={formData.name ?? ""} onChange={(e) => setField("name", e.target.value)} /></label>
-            <label>Гос. номер <input value={formData.state_number ?? ""} onChange={(e) => setField("state_number", e.target.value)} /></label>
-            <label>Тип <input value={formData.type ?? ""} onChange={(e) => setField("type", e.target.value)} /></label>
-            <label>Статус <input value={formData.status ?? ""} onChange={(e) => setField("status", e.target.value)} /></label>
-            <label>Glonass ID <input value={formData.glonass_id ?? ""} onChange={(e) => setField("glonass_id", e.target.value)} /></label>
-            <label>Пробег <input type="number" value={formData.mileage ?? ""} onChange={(e) => setField("mileage", e.target.value ? Number(e.target.value) : "")} /></label>
-            <label>Грузоподъемность <input type="number" value={formData.load_capacity ?? ""} onChange={(e) => setField("load_capacity", e.target.value ? Number(e.target.value) : "")} /></label>
+      {isModalOpen && selectedVehicle && (
+        <UiModal
+          title={`Транспорт #${selectedVehicle.id}`}
+          onClose={closeModal}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 8,
+            }}
+          >
+            <label>
+              Марка{" "}
+              <input
+                value={formData.brand ?? ""}
+                onChange={(e) => setField("brand", e.target.value)}
+              />
+            </label>
+            <label>
+              Название{" "}
+              <input
+                value={formData.name ?? ""}
+                onChange={(e) => setField("name", e.target.value)}
+              />
+            </label>
+            <label>
+              Гос. номер{" "}
+              <input
+                value={formData.state_number ?? ""}
+                onChange={(e) => setField("state_number", e.target.value)}
+              />
+            </label>
+            <label>
+              Тип{" "}
+              <input
+                value={formData.type ?? ""}
+                onChange={(e) => setField("type", e.target.value)}
+              />
+            </label>
+            <label>
+              Статус{" "}
+              <input
+                value={formData.status ?? ""}
+                onChange={(e) => setField("status", e.target.value)}
+              />
+            </label>
+            <label>
+              Glonass ID{" "}
+              <input
+                value={formData.glonass_id ?? ""}
+                onChange={(e) => setField("glonass_id", e.target.value)}
+              />
+            </label>
+            <label>
+              Пробег{" "}
+              <input
+                type="number"
+                value={formData.mileage ?? ""}
+                onChange={(e) =>
+                  setField("mileage", e.target.value ? Number(e.target.value) : "")
+                }
+              />
+            </label>
+            <label>
+              Грузоподъемность{" "}
+              <input
+                type="number"
+                value={formData.load_capacity ?? ""}
+                onChange={(e) =>
+                  setField(
+                    "load_capacity",
+                    e.target.value ? Number(e.target.value) : ""
+                  )
+                }
+              />
+            </label>
 
-            <label>Имя <input value={formData.user?.name ?? ""} onChange={(e) => setField("user.name", e.target.value)} /></label>
-            <label>Фамилия <input value={formData.user?.surname ?? ""} onChange={(e) => setField("user.surname", e.target.value)} /></label>
-            <label>Отчество <input value={formData.user?.patronymic ?? ""} onChange={(e) => setField("user.patronymic", e.target.value)} /></label>
-            <label>Телефон <input value={formData.user?.phone ?? ""} onChange={(e) => setField("user.phone", e.target.value)} /></label>
-            <label>Email <input value={formData.user?.email ?? ""} onChange={(e) => setField("user.email", e.target.value)} /></label>
+            <label>
+              Имя{" "}
+              <input
+                value={formData.user?.name ?? ""}
+                onChange={(e) => setField("user.name", e.target.value)}
+              />
+            </label>
+            <label>
+              Фамилия{" "}
+              <input
+                value={formData.user?.surname ?? ""}
+                onChange={(e) => setField("user.surname", e.target.value)}
+              />
+            </label>
+            <label>
+              Отчество{" "}
+              <input
+                value={formData.user?.patronymic ?? ""}
+                onChange={(e) => setField("user.patronymic", e.target.value)}
+              />
+            </label>
+            <label>
+              Телефон{" "}
+              <input
+                value={formData.user?.phone ?? ""}
+                onChange={(e) => setField("user.phone", e.target.value)}
+              />
+            </label>
+            <label>
+              Email{" "}
+              <input
+                value={formData.user?.email ?? ""}
+                onChange={(e) => setField("user.email", e.target.value)}
+              />
+            </label>
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 12 }}>
-            <button onClick={closeModal} className="px-4 py-2 bg-gray-200">Отмена</button>
-            <button onClick={handleSave} className="px-4 py-2 bg-blue-600 text-white" disabled={saving}>{saving ? "Сохраняем..." : "Сохранить"}</button>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 8,
+              marginTop: 12,
+            }}
+          >
+            <button onClick={closeModal} className="px-4 py-2 bg-gray-200">
+              Отмена
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-blue-600 text-white"
+              disabled={saving}
+            >
+              {saving ? "Сохраняем..." : "Сохранить"}
+            </button>
           </div>
 
           {error && <p style={{ color: "red", marginTop: 8 }}>{error}</p>}
