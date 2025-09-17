@@ -18,7 +18,12 @@ export default function UsersTable() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [editUserId, setEditUserId] = useState(null);
-
+  const [showCompensationModal, setShowCompensationModal] = useState(false);
+  const [compensationForm, setCompensationForm] = useState({
+    fixed_compensation: "",
+    percent_rate_per_completion: "",
+    income_per_km: "",
+  });
   // 🔹 форма для нового юзера
   const [newUser, setNewUser] = useState({
     name: "",
@@ -159,7 +164,70 @@ export default function UsersTable() {
       alert(err.message);
     }
   };
+  const openCompensationModal = async (userId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Нет токена");
+  
+      const res = await fetch(`${API_URL}/user?id=${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (!res.ok) throw new Error("Не удалось получить данные пользователя");
+  
+      const userDataArray = await res.json();
+      if (!Array.isArray(userDataArray) || userDataArray.length === 0)
+        throw new Error("Пользователь не найден");
+  
+      const userData = userDataArray[0]; // 🔹 берём первый элемент массива
+  
+      setEditUserId(userData.id);
+      setCompensationForm({
+        fixed_compensation: userData.compensation?.fixed_compensation ?? 0,
+        percent_rate_per_completion: userData.compensation?.percent_rate_per_completion ?? 0,
+        income_per_km: userData.compensation?.income_per_km ?? 0,
+      });
+  
+      setShowCompensationModal(true);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+  
+  
 
+  const handleUpdateCompensation = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Нет токена");
+  
+      const params = new URLSearchParams({
+        user_id: editUserId,
+        fixed_compensation: compensationForm.fixed_compensation || 0,
+        percent_rate_per_completion: compensationForm.percent_rate_per_completion || 0,
+        income_per_km: compensationForm.income_per_km || 0,
+      });
+  
+      const res = await fetch(`${API_URL}/user-compensation?${params.toString()}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || data.message || "Ошибка обновления ставки");
+  
+      setShowCompensationModal(false);
+      await fetchUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+  
+  
+  
+  
   // --- открыть модалку редактирования ---
   const openEditModal = (user) => {
     setEditUserId(user.id);
@@ -364,12 +432,59 @@ export default function UsersTable() {
           >
             <UiTableButton label="Сохранить" onClick={handleUpdateUser} />
             <UiTableButton
-              label="Отмена"
-              onClick={() => setShowEditModal(false)}
+              label="Редактировать ставку"
+              onClick={() => openCompensationModal(editForm.id)}
             />
           </div>
         </UiModal>
       )}
+
+      {/* --- Модалка редактирования ставки ---*/}
+      {showCompensationModal && (
+  <UiModal
+    title="Редактировать ставку"
+    onClose={() => setShowCompensationModal(false)}
+  >
+    <div className="users-form">
+      <input
+        placeholder="ID пользователя"
+        value={editUserId}
+        disabled
+      />
+      <input
+        placeholder="Фиксированная ставка"
+        type="number"
+        step="0.01"
+        value={compensationForm.fixed_compensation}
+        onChange={(e) =>
+          setCompensationForm({ ...compensationForm, fixed_compensation: e.target.value })
+        }
+      />
+      <input
+        placeholder="% от выполненных заказов"
+        type="number"
+        step="0.01"
+        value={compensationForm.percent_rate_per_completion}
+        onChange={(e) =>
+          setCompensationForm({ ...compensationForm, percent_rate_per_completion: e.target.value })
+        }
+      />
+      <input
+        placeholder="Ставка за км"
+        type="number"
+        step="0.01"
+        value={compensationForm.income_per_km}
+        onChange={(e) =>
+          setCompensationForm({ ...compensationForm, income_per_km: e.target.value })
+        }
+      />
+    </div>
+    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 12 }}>
+      <UiTableButton label="Сохранить" onClick={handleUpdateCompensation} />
+    </div>
+  </UiModal>
+)}
+
     </div>
   );
 }
