@@ -11,9 +11,12 @@ export default function UsersSalaryTable() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-  // 🔹 Пагинация
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // 🔹 для модалки
+  const [selectedUserPayments, setSelectedUserPayments] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const API_URL = "https://dlm-agent.ru/api/v1";
 
@@ -128,6 +131,13 @@ export default function UsersSalaryTable() {
     currentPage * itemsPerPage
   );
 
+  // --- Открыть модалку при клике на row ---
+  const openModal = (userId) => {
+    const userPayments = payments.filter((p) => p.userId === userId);
+    setSelectedUserPayments(userPayments);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="errorreport bg-card-light">
       <div className="errorreport-title">
@@ -162,9 +172,10 @@ export default function UsersSalaryTable() {
               { header: "ФИО", render: (p) => p.fullName },
               { header: "Роли", render: (p) => p.roles },
               { header: "Сумма", render: (p) => `${p.amount} ₽` },
-             
             ]}
             data={paginated}
+            onRowClick={(row) => openModal(row.userId)} // 🔹 клик по строке
+            rowStyle={{ cursor: "pointer" }}
           />
         )}
         {/* 🔹 Пагинация */}
@@ -191,14 +202,125 @@ export default function UsersSalaryTable() {
             Вперёд
           </button>
         </div>
-        
       </div>
       <div className="button-top">
         <UiTableButton
-                      label="Скачать Excel"
-                      style={{ width: "100%", margin: "0 auto" }}
-                    />
+          label="Скачать Excel"
+          style={{ width: "100%", margin: "0 auto" }}
+        />
       </div>
+
+      {/* --- Модалка --- */}
+      {isModalOpen && selectedUserPayments && (
+        <div
+          className="modal-overlay"
+          onClick={() => setIsModalOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              backgroundColor: "#fff",
+              padding: "20px",
+              borderRadius: "12px",
+              width: "500px",
+              maxHeight: "80vh",
+              overflowY: "auto",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+            }}
+          >
+            <button
+              onClick={() => setIsModalOpen(false)}
+              style={{
+                position: "absolute",
+                top: "0",
+                right: "0",
+                background: "transparent",
+                border: "none",
+                fontSize: "25px",
+                fontWeight: "bold",
+                color: "red",
+                cursor: "pointer",
+              }}
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
+
+            <h2 style={{ marginBottom: "10px" }}>
+              {selectedUserPayments[0].fullName}
+            </h2>
+
+            <p
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                marginBottom: "20px",
+                color: "#28a745",
+              }}
+            >
+              Всего к выплате:{" "}
+              {selectedUserPayments
+                .reduce((sum, p) => sum + (p.amount || 0), 0)
+                .toFixed(2)}{" "}
+              ₽
+            </p>
+
+            {selectedUserPayments.map((p) => (
+              <div
+                key={p.id}
+                style={{
+                  border: "1px solid #eee",
+                  borderRadius: "10px",
+                  padding: "15px",
+                  marginBottom: "10px",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                }}
+              >
+                <p style={{ margin: "5px 0", fontWeight: "bold" }}>
+                  {new Date(p.date).toLocaleString("ru-RU")}
+                </p>
+                <p style={{ margin: "5px 0", fontSize: "18px", color: "#007bff" }}>
+                  {p.amount} ₽
+                </p>
+                <p style={{ margin: "5px 0", color: "#555" }}>
+                  {p.description || "Без описания"}
+                </p>
+              </div>
+            ))}
+
+            <button
+              onClick={() => setIsModalOpen(false)}
+              style={{
+                marginTop: "15px",
+                padding: "10px 15px",
+                backgroundColor: "#007bff",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
