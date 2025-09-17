@@ -55,10 +55,6 @@ export default function ErrorReport() {
     setIsModalOpen(false);
   };
 
-  const handleStatusChange = (e) => {
-    setSelectedReport({ ...selectedReport, status: e.target.value });
-  };
-
   if (loading) return <Loader />;
   if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
 
@@ -77,62 +73,22 @@ export default function ErrorReport() {
           <UiTable
             data={visibleReports}
             columns={[
-              {
-                header: "ID",
-                render: (r) => (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    onClick={() => openModal(r)}
-                  >
-                    {r.id}
-                  </div>
-                ),
-              },
-              {
-                header: "Тип проблемы",
-                render: (r) => (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    onClick={() => openModal(r)}
-                  >
-                    {r.report_type}
-                  </div>
-                ),
-              },
+              { header: "ID", render: (r) => r.id },
+              { header: "Тип проблемы", render: (r) => r.report_type },
               {
                 header: "Статус",
                 render: (r) => (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    onClick={() => openModal(r)}
-                  >
-                    <FaCircle color={r.status ? "green" : "red"} /> {r.status}
-                  </div>
+                  <>
+                    <FaCircle color={r.status ? "green" : "red"} />{" "}
+                    {r.status || "Новая"}
+                  </>
                 ),
               },
-              {
-                header: "Заявитель",
-                render: (r) => (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    onClick={() => openModal(r)}
-                  >
-                    {r.fullName || "Не назначен"}
-                  </div>
-                ),
-              },
-              {
-                header: "Ответственный",
-                render: (r) => (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    onClick={() => openModal(r)}
-                  >
-                    {r.resolver || "Не назначен"}
-                  </div>
-                ),
-              },
+              { header: "Заявитель", render: (r) => r.fullName || "Не назначен" },
+              { header: "Ответственный", render: (r) => r.resolver || "Не назначен" },
             ]}
+            onRowClick={(row) => openModal(row)} // 🔹 теперь клик по строке
+            rowStyle={{ cursor: "pointer" }}
           />
         )}
       </div>
@@ -155,7 +111,7 @@ export default function ErrorReport() {
                 }}
               >
                 <FaCircle color={selectedReport.status ? "green" : "red"} />
-                {selectedReport.status ? selectedReport.status : "Новая"}
+                {selectedReport.status || "Новая"}
               </span>
             </p>
           </div>
