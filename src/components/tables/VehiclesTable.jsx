@@ -211,6 +211,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.brand ?? ""}
                 onChange={(e) => setField("brand", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -218,6 +219,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.name ?? ""}
                 onChange={(e) => setField("name", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -225,6 +227,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.state_number ?? ""}
                 onChange={(e) => setField("state_number", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -232,6 +235,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.type ?? ""}
                 onChange={(e) => setField("type", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -239,6 +243,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.status ?? ""}
                 onChange={(e) => setField("status", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -246,6 +251,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.glonass_id ?? ""}
                 onChange={(e) => setField("glonass_id", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -256,6 +262,7 @@ export default function VehiclesPage() {
                 onChange={(e) =>
                   setField("mileage", e.target.value ? Number(e.target.value) : "")
                 }
+                className="filter-input"
               />
             </label>
             <label>
@@ -269,6 +276,7 @@ export default function VehiclesPage() {
                     e.target.value ? Number(e.target.value) : ""
                   )
                 }
+                className="filter-input"
               />
             </label>
 
@@ -277,6 +285,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.user?.name ?? ""}
                 onChange={(e) => setField("user.name", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -284,6 +293,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.user?.surname ?? ""}
                 onChange={(e) => setField("user.surname", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -291,6 +301,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.user?.patronymic ?? ""}
                 onChange={(e) => setField("user.patronymic", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -298,6 +309,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.user?.phone ?? ""}
                 onChange={(e) => setField("user.phone", e.target.value)}
+                className="filter-input"
               />
             </label>
             <label>
@@ -305,6 +317,7 @@ export default function VehiclesPage() {
               <input
                 value={formData.user?.email ?? ""}
                 onChange={(e) => setField("user.email", e.target.value)}
+                className="filter-input"
               />
             </label>
           </div>
