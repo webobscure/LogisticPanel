@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import UiTable from "../ui/atoms/table";
 import UiTableButton from "../ui/atoms/button";
 import { FaCashRegister } from "react-icons/fa";
-
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ru from "date-fns/locale/ru"; 
 export default function DriversSalaryTable() {
   const [payments, setPayments] = useState([]);
   const [filteredPayments, setFilteredPayments] = useState([]);
@@ -18,6 +20,7 @@ export default function DriversSalaryTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const API_URL = "https://dlm-agent.ru/api/v1";
+  registerLocale("ru", ru); // регистрируем локаль
 
   // --- Загрузка данных ---
   useEffect(() => {
@@ -136,7 +139,7 @@ export default function DriversSalaryTable() {
       const token = localStorage.getItem("accessToken");
       if (!token) throw new Error("Нет токена");
 
-      let url = `${API_URL}/user-payment/excel/all`;
+      let url = `${API_URL}/user-salary/drivers/excel`;
       const params = [];
       if (dateFrom) params.push(`from=${dateFrom}`);
       if (dateTo) params.push(`to=${dateTo}`);
@@ -172,19 +175,30 @@ export default function DriversSalaryTable() {
       </div>
 
       {/* --- Фильтр --- */}
-      <div className="filter-form user-form" style={{ marginBottom: "20px" }}>
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
-          className="filter-input"
-        />
-        <input
-          type="date"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
-          className="filter-input"
-        />
+      <div className="filter-form user-form" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      <DatePicker
+            selected={dateFrom}
+            onChange={(date) => setDateFrom(date)}
+            selectsStart
+            startDate={dateFrom}
+            endDate={dateTo}
+            placeholderText="дд.мм.гггг"
+            dateFormat="dd-mm-yyyy"
+            className="filter-input"
+            locale="ru"
+          />
+          <DatePicker
+            selected={dateTo}
+            onChange={(date) => setDateTo(date)}
+            selectsEnd
+            startDate={dateFrom}
+            endDate={dateTo}
+            minDate={dateFrom}
+            placeholderText="дд.мм.гггг"
+            dateFormat="dd-mm-yyyy"
+            className="filter-input"
+            locale="ru"
+          />
       </div>
 
       {/* --- Таблица --- */}

@@ -1,20 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import UiTable from "../ui/atoms/table";
 import { FaCashRegister, FaCheck, FaTimes, FaCircle } from "react-icons/fa";
 import UiTableButton from "../ui/atoms/button";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ru from "date-fns/locale/ru"; 
 
 export default function ProbegTable() {
   const [data, setData] = useState([]);
   const [visibleData, setVisibleData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [dateFrom, setDateFrom] = useState("2025-09-10");
-  const [dateTo, setDateTo] = useState("2025-09-22");
+
+  // --- Используем Date объекты, а не строки ---
+  const [dateFrom, setDateFrom] = useState(new Date("2025-09-10"));
+  const [dateTo, setDateTo] = useState(new Date("2025-09-22"));
 
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 10;
 
   const API_URL = "https://dlm-agent.ru/api/v1";
+  registerLocale("ru", ru); // регистрируем локаль
 
   const formatDate = (date, endOfDay = false) => {
     if (!date) return null;
@@ -24,13 +30,10 @@ export default function ProbegTable() {
     } else {
       d.setHours(0, 0, 0, 0);
     }
-    const iso = d.toISOString();
-    const [datePart, timePart] = iso.replace("Z", "").split("T");
-    const [hh, mm, ssMs] = timePart.split(":");
-    const [ss, ms] = ssMs.split(".");
-    return `${datePart}T${hh}:${mm}:${ss}.${ms.padEnd(6, "0")}`;
+    return d.toISOString();
   };
 
+  // --- Загрузка данных ---
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,15 +44,14 @@ export default function ProbegTable() {
         const from = formatDate(dateFrom, false);
         const to = formatDate(dateTo, true);
 
-        // 1. Загружаем список машин
+        // 1. Получаем список машин
         const vehiclesRes = await fetch(`${API_URL}/vehicle/all`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const vehicles = await vehiclesRes.json();
 
-        // 2. Загружаем пробег по каждому glonass_id
+        // 2. Получаем пробег
         const allRows = [];
-
         for (const vehicle of vehicles) {
           if (!vehicle.glonass_id) continue;
 
@@ -59,7 +61,6 @@ export default function ProbegTable() {
           );
           const mileageJson = await mileageRes.json();
 
-          // mileageJson → [{ vehicleId, name, periods: [...] }]
           for (const item of mileageJson) {
             item.periods.forEach((period, i) => {
               allRows.push({
@@ -90,6 +91,7 @@ export default function ProbegTable() {
     fetchData();
   }, [dateFrom, dateTo]);
 
+  // --- Пагинация ---
   const totalPages = Math.ceil(visibleData.length / perPage);
   const paginated = visibleData.slice(
     (currentPage - 1) * perPage,
@@ -102,21 +104,37 @@ export default function ProbegTable() {
         <FaCashRegister /> Пробег за период
       </div>
 
-      <div className="filter-form user-form" style={{ marginBottom: "20px" }}>
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
+      {/* --- Календарь с flex --- */}
+      <div
+        className="filter-form user-form"
+        style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}
+      >
+        <DatePicker
+          selected={dateFrom}
+          onChange={(date) => setDateFrom(date)}
+          selectsStart
+          startDate={dateFrom}
+          endDate={dateTo}
+          placeholderText="С"
+          dateFormat="dd.MM.yyyy"
           className="filter-input"
+          locale="ru"
         />
-        <input
-          type="date"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
+        <DatePicker
+          selected={dateTo}
+          onChange={(date) => setDateTo(date)}
+          selectsEnd
+          startDate={dateFrom}
+          endDate={dateTo}
+          minDate={dateFrom}
+          placeholderText="По"
+          dateFormat="dd.MM.yyyy"
           className="filter-input"
+          locale="ru"
         />
       </div>
 
+      {/* --- Таблица --- */}
       <div className="errorreport-table">
         {loading && <p>Загрузка...</p>}
         {error && <p style={{ color: "red" }}>Ошибка: {error}</p>}
@@ -130,8 +148,7 @@ export default function ProbegTable() {
                 header: "Статус",
                 render: (r) => (
                   <>
-                    <FaCircle color={r.status === "Активна" ? "green" : "red"} />{" "}
-                    {r.status}
+                    <FaCircle color={r.status === "Активна" ? "green" : "red"} /> {r.status}
                   </>
                 ),
               },
@@ -149,13 +166,9 @@ export default function ProbegTable() {
           />
         )}
 
+        {/* --- Пагинация --- */}
         <div className="pagination">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-          >
-            Назад
-          </button>
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>Назад</button>
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
@@ -165,19 +178,12 @@ export default function ProbegTable() {
               {i + 1}
             </button>
           ))}
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-          >
-            Вперёд
-          </button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => p + 1)}>Вперёд</button>
         </div>
+
         <div className="button-top">
-                <UiTableButton
-                              label="Скачать Excel"
-                              style={{ width: "100%", margin: "0 auto" }}
-                            />
-              </div>
+          <UiTableButton label="Скачать Excel" style={{ width: "100%", margin: "0 auto" }} />
+        </div>
       </div>
     </div>
   );
