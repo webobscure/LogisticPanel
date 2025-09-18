@@ -11,7 +11,7 @@ export default function UiSelect({
   title
 }) {
   return (
-    <div className="filter-container" style={{ flex: "1 1 200px", minWidth: "150px" }}>
+    <div className="filter-container">
       {title && <h1>{title}</h1>}
       <select
         className={`ui-select ${className}`}
