@@ -9,7 +9,7 @@ import Loader from "../ui/molecules/Loader";
 const API_URL = "https://dlm-agent.ru/api/v1";
 
 export default function RacesToday() {
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Открыт");
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,11 +34,20 @@ export default function RacesToday() {
   const fetchAllOrders = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/logist-order/all`, {
+
+      // Берём все статусы кроме "Отменен"
+      const activeStatuses = statuses
+        .filter((s) => s.value !== "Отменен")
+        .map((s) => `status=${encodeURIComponent(s.value)}`)
+        .join("&");
+
+      const res = await fetch(`${API_URL}/logist-order/all?${activeStatuses}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (!res.ok) throw new Error(`Ошибка ${res.status}: ${await res.text()}`);
       const data = await res.json();
+
       const formatted = data.map((trip) => ({
         id: trip.id,
         status: trip.status,
@@ -64,9 +73,8 @@ export default function RacesToday() {
         height: trip.cargo_height,
         width: trip.cargo_width,
         length: trip.cargo_length,
-        vehicleId: trip.vehicle_id,
-        driverId: trip.driver_id,
       }));
+
       setTrips(formatted);
     } catch (err) {
       setError(err.message);
@@ -442,17 +450,19 @@ export default function RacesToday() {
           onClick={isNew ? createTrip : saveTrip}
         />
         {!isNew && (
-          <UiTableButton
-            className="deny-button"
-            label="Удалить рейс"
-            onClick={deleteTrip}
-          />
+          <>
+            <UiTableButton
+              className="deny-button"
+              label="Удалить рейс"
+              onClick={deleteTrip}
+            />
+            <UiTableButton
+              className="save-button"
+              label={"Отменить рейс"}
+              onClick={cancelTrip}
+            />
+          </>
         )}
-        <UiTableButton
-          className="save-button"
-          label={"Отменить рейс"}
-          onClick={cancelTrip}
-        />
       </div>
     </div>
   );
