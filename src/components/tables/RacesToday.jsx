@@ -256,6 +256,21 @@ export default function RacesToday() {
       alert(`Ошибка удаления: ${err.message}`);
     }
   };
+  const cancelTrip = async () => {
+    if (!selectedTrip?.id) return;
+    if (!confirm("Вы уверены, что хотите отменить рейс?")) return;
+    try {
+      const res = await fetch(`${API_URL}/logist-order?id=${selectedTrip.id}&status=Закрыт`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`Ошибка ${res.status}: ${await res.text()}`);
+      await fetchAllOrders();
+      closeTripModal();
+    } catch (err) {
+      alert(`Ошибка отмены: ${err.message}`);
+    }
+  };
 
   useEffect(() => {
     fetchAllOrders();
@@ -397,6 +412,11 @@ export default function RacesToday() {
         {!isNew && (
           <UiTableButton className="deny-button" label="Удалить рейс" onClick={deleteTrip} />
         )}
+        <UiTableButton
+          className="save-button"
+          label={"Отменить рейс" }
+          onClick={cancelTrip}
+        />
       </div>
     </div>
   );
