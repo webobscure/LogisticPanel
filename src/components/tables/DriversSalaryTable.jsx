@@ -221,9 +221,9 @@ export default function DriversSalaryTable() {
             rowStyle={{ cursor: "pointer" }}
           />
         )}
-
-        {/* --- Пагинация --- */}
-        <div className="pagination">
+        { totalPages.length < 10 ? (
+          <>
+          <div className="pagination">
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((p) => p - 1)}
@@ -246,15 +246,26 @@ export default function DriversSalaryTable() {
             Вперёд
           </button>
         </div>
-
-        {/* --- Скачать Excel --- */}
+         <div className="button-top">
+         <UiTableButton
+           label="Скачать Excel"
+           style={{ width: "100%", margin: "0 auto" }}
+           onClick={downloadExcel}
+         />
+       </div>
+          </>
+        ) : ( 
         <div className="button-top">
           <UiTableButton
             label="Скачать Excel"
             style={{ width: "100%", margin: "0 auto" }}
             onClick={downloadExcel}
           />
-        </div>
+        </div>) 
+        }
+        
+
+       
       </div>
 
       {/* --- Модалка --- */}

@@ -144,7 +144,7 @@ export default function UsersSalaryTable() {
       const fileUrl = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = fileUrl;
-      a.download = "Зарплата сотрудников.xlsx";
+      a.download = "Выплаты сотрудникам.xlsx";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -207,8 +207,9 @@ export default function UsersSalaryTable() {
           />
         )}
 
-        {/* --- Пагинация --- */}
-        <div className="pagination">
+        { totalPages.length < 10 ? (
+          <>
+          <div className="pagination">
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((p) => p - 1)}
@@ -231,15 +232,23 @@ export default function UsersSalaryTable() {
             Вперёд
           </button>
         </div>
-
-        {/* --- Скачать Excel --- */}
+         <div className="button-top">
+         <UiTableButton
+           label="Скачать Excel"
+           style={{ width: "100%", margin: "0 auto" }}
+           onClick={downloadExcel}
+         />
+       </div>
+          </>
+        ) : ( 
         <div className="button-top">
           <UiTableButton
             label="Скачать Excel"
             style={{ width: "100%", margin: "0 auto" }}
             onClick={downloadExcel}
           />
-        </div>
+        </div>) 
+        }
       </div>
 
       {/* --- Модалка --- */}
