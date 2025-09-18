@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaMap } from "react-icons/fa";
+import { FaMap, FaPlus } from "react-icons/fa";
 import UiSelect from "../ui/atoms/select";
 import UiTable from "../ui/atoms/table";
 import UiTableButton from "../ui/atoms/button";
@@ -14,6 +14,7 @@ export default function RacesToday() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [newTripModal, setNewTripModal] = useState(false);
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
 
@@ -24,24 +25,18 @@ export default function RacesToday() {
     { value: "Закрыт", label: "Закрыт" },
   ];
 
-  const handleTime = (t) => {
-    if (!t) return "";
-    const dt = new Date(t);
-    return dt.toISOString().slice(0, 16);
-  };
+  const token = localStorage.getItem("accessToken");
+
+  const handleTime = (t) => (t ? new Date(t).toISOString().slice(0, 16) : "");
 
   const fetchAllOrders = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Нет токена");
-
       const res = await fetch(`${API_URL}/logist-order/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`Ошибка ${res.status}: ${await res.text()}`);
       const data = await res.json();
-
       const formatted = data.map((trip) => ({
         id: trip.id,
         status: trip.status,
@@ -63,14 +58,13 @@ export default function RacesToday() {
         unloadingCity: trip.unloading_city,
         unloadingStreet: trip.unloading_street,
         unloadingTime: trip.unloading_time,
-        weight: trip.weight,
-        height: trip.height,
-        width: trip.width,
-        length: trip.length,
+        weight: trip.cargo_weight,
+        height: trip.cargo_height,
+        width: trip.cargo_width,
+        length: trip.cargo_length,
         vehicleId: trip.vehicle_id,
         driverId: trip.driver_id,
       }));
-
       setTrips(formatted);
     } catch (err) {
       setError(err.message);
@@ -81,7 +75,6 @@ export default function RacesToday() {
 
   const fetchVehicles = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
       const res = await fetch(`${API_URL}/vehicle/all?status=active`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -100,7 +93,6 @@ export default function RacesToday() {
 
   const fetchDrivers = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
       const res = await fetch(`${API_URL}/user/all?role=driver`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -121,11 +113,148 @@ export default function RacesToday() {
     fetchVehicles();
     fetchDrivers();
   };
+  const closeTripModal = () => setSelectedTrip(null);
+  const openNewTripModal = () => {
+    setNewTripModal(true);
+    fetchVehicles();
+    fetchDrivers();
+  };
+  const closeNewTripModal = () => setNewTripModal(false);
 
-  const closeModal = () => setSelectedTrip(null);
+  const [newTrip, setNewTrip] = useState({
+    status: "Открыт",
+    loadingCountry: "Россия",
+    unloadingCountry: "Россия",
+    customerName: "",
+    customerContacts: "",
+    comment: "",
+    price: 0,
+    vehicleId: null,
+    driverId: null,
+    loadingCity: "",
+    loadingStreet: "",
+    loadingTime: "",
+    unloadingCity: "",
+    unloadingStreet: "",
+    unloadingTime: "",
+    weight: "",
+    height: "",
+    width: "",
+    length: "",
+  });
 
-  const handleFieldChange = (field, value) => {
-    setSelectedTrip((prev) => ({ ...prev, [field]: value }));
+  const handleFieldChange = (field, value, isNew = false) => {
+    if (isNew) setNewTrip((prev) => ({ ...prev, [field]: value }));
+    else setSelectedTrip((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const saveTrip = async () => {
+    try {
+      if (!selectedTrip?.id) return;
+  
+      if (!selectedTrip.customerName || !selectedTrip.customerContacts || !selectedTrip.price) {
+        alert("Пожалуйста, заполните имя клиента, контакты и цену.");
+        return;
+      }
+  
+      const params = new URLSearchParams();
+  
+      // Добавляем только те параметры, которые есть
+      if (selectedTrip.driverId) params.append("user_id", selectedTrip.driverId);
+      if (selectedTrip.status) params.append("status", selectedTrip.status);
+      if (selectedTrip.loadingTime) params.append("loading_time", selectedTrip.loadingTime);
+      if (selectedTrip.loadingCountry) params.append("loading_country", selectedTrip.loadingCountry);
+      if (selectedTrip.loadingCity) params.append("loading_city", selectedTrip.loadingCity);
+      if (selectedTrip.loadingStreet) params.append("loading_street", selectedTrip.loadingStreet);
+      if (selectedTrip.unloadingTime) params.append("unloading_time", selectedTrip.unloadingTime);
+      if (selectedTrip.unloadingCountry) params.append("unloading_country", selectedTrip.unloadingCountry);
+      if (selectedTrip.unloadingCity) params.append("unloading_city", selectedTrip.unloadingCity);
+      if (selectedTrip.unloadingStreet) params.append("unloading_street", selectedTrip.unloadingStreet);
+      if (selectedTrip.customerName) params.append("customer_name", selectedTrip.customerName);
+      if (selectedTrip.customerContacts) params.append("customer_contacts", selectedTrip.customerContacts);
+      if (selectedTrip.weight) params.append("cargo_weight", selectedTrip.weight);
+      if (selectedTrip.height) params.append("cargo_height", selectedTrip.height);
+      if (selectedTrip.width) params.append("cargo_width", selectedTrip.width);
+      if (selectedTrip.length) params.append("cargo_length", selectedTrip.length);
+      if (selectedTrip.comment) params.append("comments", selectedTrip.comment);
+      if (selectedTrip.price) params.append("price", selectedTrip.price);
+  
+      const res = await fetch(`${API_URL}/logist-order?id=${selectedTrip.id}&${params.toString()}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) throw new Error(`Ошибка ${res.status}: ${await res.text()}`);
+      await fetchAllOrders();
+      closeTripModal();
+    } catch (err) {
+      alert(`Ошибка сохранения: ${err.message}`);
+    }
+  };
+  
+  
+
+  const createTrip = async () => {
+    try {
+      if (!newTrip.customerName || !newTrip.customerContacts || !newTrip.price) {
+        alert("Пожалуйста, заполните имя клиента, контакты и цену.");
+        return;
+      }
+  
+      // Формируем query-параметры
+      const params = new URLSearchParams({
+        customer_name: newTrip.customerName,
+        customer_contacts: newTrip.customerContacts,
+        price: newTrip.price,
+        status: newTrip.status || "Открыт",
+        loading_time: newTrip.loadingTime || "",
+        loading_country: newTrip.loadingCountry || "Россия",
+        loading_city: newTrip.loadingCity || "",
+        loading_street: newTrip.loadingStreet || "",
+        unloading_time: newTrip.unloadingTime || "",
+        unloading_country: newTrip.unloadingCountry || "Россия",
+        unloading_city: newTrip.unloadingCity || "",
+        unloading_street: newTrip.unloadingStreet || "",
+        cargo_weight: newTrip.weight || "",
+        cargo_height: newTrip.height || "",
+        cargo_width: newTrip.width || "",
+        cargo_length: newTrip.length || "",
+        comments: newTrip.comment || "",
+      });
+  
+      const res = await fetch(`${API_URL}/logist-order?${params.toString()}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) throw new Error(`Ошибка ${res.status}: ${await res.text()}`);
+      await fetchAllOrders();
+      closeNewTripModal();
+    } catch (err) {
+      alert(`Ошибка создания рейса: ${err.message}`);
+    }
+  };
+  
+  
+
+  const deleteTrip = async () => {
+    if (!selectedTrip?.id) return;
+    if (!confirm("Вы уверены, что хотите удалить рейс?")) return;
+    try {
+      const res = await fetch(`${API_URL}/logist-order?id=${selectedTrip.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`Ошибка ${res.status}: ${await res.text()}`);
+      await fetchAllOrders();
+      closeTripModal();
+    } catch (err) {
+      alert(`Ошибка удаления: ${err.message}`);
+    }
   };
 
   useEffect(() => {
@@ -135,12 +264,150 @@ export default function RacesToday() {
   if (loading) return <Loader />;
   if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
 
+  const renderTripForm = (trip, isNew = false) => (
+    <div className="details-container">
+      {/* Погрузка */}
+      <div className="details-section">
+        <h4>Погрузка</h4>
+        <div className="details-grid">
+          {["Country", "City", "Street", "Time"].map((f, i) => (
+            <div key={i} className="details-item">
+              <label>{f === "Time" ? "Время погрузки" : f}</label>
+              {f === "Time" ? (
+                <input
+                  type="datetime-local"
+                  className="ui-input"
+                  value={handleTime(trip.loadingTime)}
+                  onChange={(e) =>
+                    handleFieldChange("loadingTime", e.target.value, isNew)
+                  }
+                />
+              ) : (
+                <input
+                  className="ui-input"
+                  value={trip[`loading${f}`] || ""}
+                  onChange={(e) =>
+                    handleFieldChange(`loading${f}`, e.target.value, isNew)
+                  }
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Разгрузка */}
+      <div className="details-section">
+        <h4>Разгрузка</h4>
+        <div className="details-grid">
+          {["Country", "City", "Street", "Time"].map((f, i) => (
+            <div key={i} className="details-item">
+              <label>{f === "Time" ? "Время разгрузки" : f}</label>
+              {f === "Time" ? (
+                <input
+                  type="datetime-local"
+                  className="ui-input"
+                  value={handleTime(trip.unloadingTime)}
+                  onChange={(e) =>
+                    handleFieldChange(`unloadingTime`, e.target.value, isNew)
+                  }
+                />
+              ) : (
+                <input
+                  className="ui-input"
+                  value={trip[`unloading${f}`] || ""}
+                  onChange={(e) =>
+                    handleFieldChange(`unloading${f}`, e.target.value, isNew)
+                  }
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Груз */}
+      <div className="details-section">
+        <h4>Груз</h4>
+        <div className="details-grid">
+          {["weight", "height", "width", "length"].map((f) => (
+            <div key={f} className="details-item">
+              <label>{f === "weight" ? "Вес (кг)" : f.charAt(0).toUpperCase() + f.slice(1) + " (мм)"}</label>
+              <input
+                type="number"
+                className="ui-input"
+                value={trip[f] || ""}
+                onChange={(e) => handleFieldChange(f, e.target.value, isNew)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Заказчик */}
+      <div className="details-section">
+        <h4>Заказчик</h4>
+        <div className="details-grid">
+          <div className="details-item">
+            <label>Имя клиента</label>
+            <input
+              className="ui-input"
+              value={trip.customerName || ""}
+              onChange={(e) =>
+                handleFieldChange("customerName", e.target.value, isNew)
+              }
+            />
+          </div>
+          <div className="details-item">
+            <label>Контакты клиента</label>
+            <input
+              className="ui-input"
+              value={trip.customerContacts || ""}
+              onChange={(e) =>
+                handleFieldChange("customerContacts", e.target.value, isNew)
+              }
+            />
+          </div>
+          <div className="details-item" style={{ gridColumn: "span 2" }}>
+            <label>Комментарий</label>
+            <textarea
+              className="ui-input"
+              value={trip.comment || ""}
+              onChange={(e) =>
+                handleFieldChange("comment", e.target.value, isNew)
+              }
+            />
+          </div>
+          <div className="details-item" style={{ gridColumn: "span 2" }}>
+            <label>Стоимость</label>
+            <input
+              type="number"
+              step="0.01"
+              className="ui-input"
+              value={trip.price || ""}
+              onChange={(e) => handleFieldChange("price", e.target.value, isNew)}
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="actions">
+        <UiTableButton
+          className="save-button"
+          label={isNew ? "Создать рейс" : "Сохранить изменения"}
+          onClick={isNew ? createTrip : saveTrip}
+        />
+        {!isNew && (
+          <UiTableButton className="deny-button" label="Удалить рейс" onClick={deleteTrip} />
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="racestoday bg-card-light">
       <div className="racestoday-block">
         <h1>
           <FaMap /> Список заказов (рейсов)
         </h1>
+        <UiTableButton className="add-button" label="Добавить рейс" onClick={openNewTripModal} />
       </div>
 
       <div className="racestoday-filter">
@@ -157,13 +424,13 @@ export default function RacesToday() {
         columns={[
           { header: "Маршрут", render: (t) => t.route },
           { header: "Статус", render: (t) => t.status },
-          {
-            header: "Водитель",
-            render: (t) =>
-              t.driverOrder
-                ? `ID:${t.driverOrder.driver_id} (${t.driverOrder.status})`
-                : "-",
-          },
+          // {
+          //   header: "Водитель",
+          //   render: (t) =>
+          //     t.driverOrder
+          //       ? `ID:${t.driverOrder.driver_id} (${t.driverOrder.status})`
+          //       : "-",
+          // },
           { header: "Заказчик", render: (t) => t.customerName },
           { header: "Контакты", render: (t) => t.customerContacts },
           { header: "Комментарий", render: (t) => t.comment },
@@ -175,251 +442,13 @@ export default function RacesToday() {
         onRowClick={(t) => openTripDetails(t)}
       />
 
-      {selectedTrip && (
-        <UiModal title={`Рейс #${selectedTrip.id}`} onClose={closeModal}>
-          <div className="details-container">
-            {/* Погрузка */}
-            <div className="details-section">
-              <h4>Погрузка</h4>
-              <div className="details-grid">
-                <div className="details-item">
-                  <label>Страна</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.loadingCountry || ""}
-                    onChange={(e) =>
-                      handleFieldChange("loadingCountry", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Город</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.loadingCity || ""}
-                    onChange={(e) =>
-                      handleFieldChange("loadingCity", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Улица</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.loadingStreet || ""}
-                    onChange={(e) =>
-                      handleFieldChange("loadingStreet", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Время погрузки</label>
-                  <input
-                    type="datetime-local"
-                    className="ui-input"
-                    value={handleTime(selectedTrip.loadingTime)}
-                    onChange={(e) =>
-                      handleFieldChange("loadingTime", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+      {selectedTrip && <UiModal title={`Рейс #${selectedTrip.id}`} onClose={closeTripModal}>
+        {renderTripForm(selectedTrip)}
+      </UiModal>}
 
-            {/* Разгрузка */}
-            <div className="details-section">
-              <h4>Разгрузка</h4>
-              <div className="details-grid">
-                <div className="details-item">
-                  <label>Страна</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.unloadingCountry || ""}
-                    onChange={(e) =>
-                      handleFieldChange("unloadingCountry", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Город</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.unloadingCity || ""}
-                    onChange={(e) =>
-                      handleFieldChange("unloadingCity", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Улица</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.unloadingStreet || ""}
-                    onChange={(e) =>
-                      handleFieldChange("unloadingStreet", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Время разгрузки</label>
-                  <input
-                    type="datetime-local"
-                    className="ui-input"
-                    value={handleTime(selectedTrip.unloadingTime)}
-                    onChange={(e) =>
-                      handleFieldChange("unloadingTime", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Груз */}
-            <div className="details-section">
-              <h4>Груз</h4>
-              <div className="details-grid">
-                <div className="details-item">
-                  <label>Вес (кг)</label>
-                  <input
-                    type="number"
-                    className="ui-input"
-                    value={selectedTrip.weight || ""}
-                    onChange={(e) =>
-                      handleFieldChange("weight", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Высота (мм)</label>
-                  <input
-                    type="number"
-                    className="ui-input"
-                    value={selectedTrip.height || ""}
-                    onChange={(e) =>
-                      handleFieldChange("height", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Ширина (мм)</label>
-                  <input
-                    type="number"
-                    className="ui-input"
-                    value={selectedTrip.width || ""}
-                    onChange={(e) => handleFieldChange("width", e.target.value)}
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Длина (мм)</label>
-                  <input
-                    type="number"
-                    className="ui-input"
-                    value={selectedTrip.length || ""}
-                    onChange={(e) =>
-                      handleFieldChange("length", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Заказчик */}
-            <div className="details-section">
-              <h4>Заказчик</h4>
-              <div className="details-grid">
-                <div className="details-item">
-                  <label>Имя клиента</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.customerName || ""}
-                    onChange={(e) =>
-                      handleFieldChange("customerName", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Контакты клиента</label>
-                  <input
-                    className="ui-input"
-                    value={selectedTrip.customerContacts || ""}
-                    onChange={(e) =>
-                      handleFieldChange("customerContacts", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item" style={{ gridColumn: "span 2" }}>
-                  <label>Комментарий</label>
-                  <textarea
-                    className="ui-input"
-                    value={selectedTrip.comment || ""}
-                    onChange={(e) =>
-                      handleFieldChange("comment", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="details-item" style={{ gridColumn: "span 2" }}>
-                  <label>Стоимость</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="ui-input"
-                    value={selectedTrip.price || ""}
-                    onChange={(e) => handleFieldChange("price", e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Назначение */}
-            <div className="details-section">
-              <h4>Назначение</h4>
-              <div className="details-grid">
-                <div className="details-item">
-                  <label>Машина</label>
-                  <UiSelect
-                    value={selectedTrip.vehicleId}
-                    onChange={(val) => {
-                      const v = vehicles.find((x) => x.value === val);
-                      handleFieldChange("vehicleId", val);
-                      if (v?.driverId)
-                        handleFieldChange("driverId", v.driverId);
-                    }}
-                    options={vehicles}
-                    placeholder="Выберите машину"
-                  />
-                </div>
-                <div className="details-item">
-                  <label>Водитель</label>
-                  <UiSelect
-                    value={selectedTrip.driverId}
-                    onChange={(val) => handleFieldChange("driverId", val)}
-                    options={drivers}
-                    placeholder="Выберите водителя"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="actions">
-              <UiTableButton
-                className="save-button"
-                label="Сохранить изменения"
-                onClick={() => console.log("сохранен", selectedTrip)}
-              />
-              <UiTableButton
-                className="accept-button"
-                label="Подтвердить доставку и закрыть"
-                onClick={() => console.log("закрыт", selectedTrip)}
-              />
-              <UiTableButton
-                className="deny-button"
-                label="Отменить заказ"
-                onClick={() => console.log("отменен", selectedTrip)}
-              />
-            </div>
-          </div>
-        </UiModal>
-      )}
+      {newTripModal && <UiModal title="Добавить новый рейс" onClose={closeNewTripModal}>
+        {renderTripForm(newTrip, true)}
+      </UiModal>}
     </div>
   );
 }

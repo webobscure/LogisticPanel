@@ -135,6 +135,7 @@ export default function MileageTable() {
         <FaCashRegister /> Пробег за период
       </div>
 
+      {/* --- Календарь --- */}
       <div
         className="filter-form user-form"
         style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}
@@ -196,15 +197,9 @@ export default function MileageTable() {
           />
         )}
 
-{ totalPages.length < 10 ? (
-          <>
-          <div className="pagination">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-          >
-            Назад
-          </button>
+        {/* --- Пагинация --- */}
+        <div className="pagination">
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>Назад</button>
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
@@ -214,30 +209,12 @@ export default function MileageTable() {
               {i + 1}
             </button>
           ))}
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-          >
-            Вперёд
-          </button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => p + 1)}>Вперёд</button>
         </div>
-         <div className="button-top">
-         <UiTableButton
-           label="Скачать Excel"
-           style={{ width: "100%", margin: "0 auto" }}
-           onClick={downloadExcel}
-         />
-       </div>
-          </>
-        ) : ( 
+
         <div className="button-top">
-          <UiTableButton
-            label="Скачать Excel"
-            style={{ width: "100%", margin: "0 auto" }}
-            onClick={downloadExcel}
-          />
-        </div>) 
-        }
+          <UiTableButton label="Скачать Excel" style={{ width: "100%", margin: "0 auto" }} onClick={downloadExcel}/>
+        </div>
       </div>
     </div>
   );

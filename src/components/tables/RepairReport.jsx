@@ -161,6 +161,7 @@ export default function RepairReport() {
           onChange={(e) =>
             setNewRepairRequest({ ...newRepairRequest, time: e.target.value })
           }
+          className="filter-input"
         />
         <input
           type="text"
@@ -169,6 +170,7 @@ export default function RepairReport() {
           onChange={(e) =>
             setNewRepairRequest({ ...newRepairRequest, vehicle: e.target.value })
           }
+          className="filter-input"
         />
         <input
           type="text"
@@ -177,6 +179,7 @@ export default function RepairReport() {
           onChange={(e) =>
             setNewRepairRequest({ ...newRepairRequest, carNumber: e.target.value })
           }
+          className="filter-input"
         />
         <input
           type="text"
@@ -185,6 +188,7 @@ export default function RepairReport() {
           onChange={(e) =>
             setNewRepairRequest({ ...newRepairRequest, description: e.target.value })
           }
+          className="filter-input"
         />
         <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 20 }}>
           <UiTableButton label="Сохранить" onClick={handleAddRepairRequest} />
