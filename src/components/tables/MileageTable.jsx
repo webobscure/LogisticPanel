@@ -6,7 +6,7 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from "date-fns/locale/ru"; 
 
-export default function ProbegTable() {
+export default function MileageTable() {
   const [data, setData] = useState([]);
   const [visibleData, setVisibleData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +56,7 @@ export default function ProbegTable() {
           if (!vehicle.glonass_id) continue;
 
           const mileageRes = await fetch(
-            `${API_URL}/glonass/vehicle-mileage?vehicle_id=${vehicle.glonass_id}&from_datetime=${from}&to_datetime=${to}&sampling_interval=86400`,
+            `${API_URL}/glonass/vehicle-mileage?glonass_id=${vehicle.glonass_id}&from_datetime=${from}&to_datetime=${to}&sampling_interval=86400`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           const mileageJson = await mileageRes.json();

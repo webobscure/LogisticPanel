@@ -13,7 +13,7 @@ import UsersTable from "../../components/tables/UsersTable";
 import VehiclesTable from "../../components/tables/VehiclesTable";
 import UsersSalaryTable from "../../components/tables/UsersSalaryTable";
 import DriversSalaryTable from "../../components/tables/DriversSalaryTable";
-import ProbegTable from "../../components/tables/ProbegTable";
+import MileageTable from "../../components/tables/MileageTable";
 
 export default function AdminPage() {
   return (
@@ -28,7 +28,7 @@ export default function AdminPage() {
           <ErrorReport />
           <DriversSalaryTable />
           <UsersSalaryTable />
-          <ProbegTable />
+          <MileageTable />
         </div>
       </div>
     </>
