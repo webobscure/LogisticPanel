@@ -347,7 +347,6 @@
   }
 }
 
-<<<<<<< HEAD
 /* UI date */
 /* Кастомные календарики */
 .custom-datepicker-input {
@@ -444,7 +443,6 @@
   cursor: pointer;
   width: 100%;
 }
-=======
 
 /* --- MODAL OVERLAY --- */
 .ui-modal-overlay {
@@ -688,4 +686,3 @@ textarea.ui-input {
     transform: translateY(0) scale(1);
   }
 }
->>>>>>> e00990680765490bffe094c1a786ce63ee0dc1c0
