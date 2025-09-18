@@ -346,6 +346,7 @@
     transform: translateY(0) scale(1);
   }
 }
+
 .button-top {
   margin-top: 1rem;
 }
@@ -444,4 +445,247 @@
   border-radius: 8px;
   cursor: pointer;
   width: 100%;
+}
+
+/* --- MODAL OVERLAY --- */
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* --- MODAL WINDOW --- */
+.ui-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.3s ease forwards;
+  margin: 0 auto; /* центрируем */
+}
+
+/* --- MODAL HEADER --- */
+.ui-modal-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ui-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a237e;
+  text-align: center;
+}
+
+.ui-modal-close {
+  position: absolute;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.ui-modal-close:hover {
+  color: #f44336;
+}
+
+/* --- MODAL CONTENT --- */
+.ui-modal-content {
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* отступ между секциями */
+  align-items: center; /* центрируем внутренние блоки */
+}
+
+/* --- SECTIONS --- */
+.details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.details-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.details-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+/* --- GRID INSIDE SECTIONS --- */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- FIELD ITEMS --- */
+.details-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.details-item label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* --- INPUTS & TEXTAREAS --- */
+.ui-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #111827;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ui-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+textarea.ui-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* --- SCROLLBAR --- */
+.ui-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ui-modal-content::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.ui-modal-content::-webkit-scrollbar-thumb {
+  background-color: #4a90e2;
+  border-radius: 4px;
+}
+
+.ui-modal-content::-webkit-scrollbar-thumb:hover {
+  background-color: #357ab8;
+}
+
+/* --- ACTION BUTTONS --- */
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 0 0 0;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.modal-actions button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.modal-actions button.save {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.modal-actions button.save:hover {
+  background-color: #357ab8;
+}
+
+.modal-actions button.confirm {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.modal-actions button.confirm:hover {
+  background-color: #1e7e34;
+}
+
+.modal-actions button.cancel {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.modal-actions button.cancel:hover {
+  background-color: #bdbdbd;
+}
+
+.actions {
+  display: flex;
+  gap: 20px;
+  justify-content: end;
+  margin: 20px 0;
+}
+
+.accept-button {
+  background-color: green;
+}
+
+.deny-button {
+  background-color: darkred;
+}
+
+/* --- ANIMATION --- */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
