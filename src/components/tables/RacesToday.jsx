@@ -23,6 +23,8 @@ export default function RacesToday() {
     { value: "В пути", label: "В пути" },
     { value: "Загружен", label: "Загружен" },
     { value: "Закрыт", label: "Закрыт" },
+    { value: "Отменен", label: "Отменен" },
+
   ];
 
   const token = localStorage.getItem("accessToken");
@@ -260,7 +262,7 @@ export default function RacesToday() {
     if (!selectedTrip?.id) return;
     if (!confirm("Вы уверены, что хотите отменить рейс?")) return;
     try {
-      const res = await fetch(`${API_URL}/logist-order?id=${selectedTrip.id}&status=Закрыт`, {
+      const res = await fetch(`${API_URL}/logist-order?id=${selectedTrip.id}&status=Отменен`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
