@@ -470,6 +470,7 @@ export default function UsersTable() {
         placeholder="ID пользователя"
         value={editUserId}
         disabled
+        className="filter-input"
       />
       <input
         placeholder="Фиксированная ставка"
@@ -479,6 +480,7 @@ export default function UsersTable() {
         onChange={(e) =>
           setCompensationForm({ ...compensationForm, fixed_compensation: e.target.value })
         }
+        className="filter-input"
       />
       <input
         placeholder="% от выполненных заказов"
@@ -488,6 +490,7 @@ export default function UsersTable() {
         onChange={(e) =>
           setCompensationForm({ ...compensationForm, percent_rate_per_completion: e.target.value })
         }
+        className="filter-input"
       />
       <input
         placeholder="Ставка за км"
@@ -497,6 +500,7 @@ export default function UsersTable() {
         onChange={(e) =>
           setCompensationForm({ ...compensationForm, income_per_km: e.target.value })
         }
+        className="filter-input"
       />
     </div>
     <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 12 }}>
