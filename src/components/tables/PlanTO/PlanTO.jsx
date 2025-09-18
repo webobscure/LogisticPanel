@@ -172,6 +172,7 @@ export default function PlanTO() {
                   vehicle: e.target.value,
                 })
               }
+              className="filter-input"
             />
             <input
               type="text"
@@ -183,6 +184,7 @@ export default function PlanTO() {
                   carNumber: e.target.value,
                 })
               }
+              className="filter-input"
             />
             <input
               type="date"
@@ -193,6 +195,7 @@ export default function PlanTO() {
                   date: e.target.value,
                 })
               }
+              className="filter-input"
             />
             <input
               type="text"
@@ -204,6 +207,7 @@ export default function PlanTO() {
                   type: e.target.value,
                 })
               }
+              className="filter-input"
             />
             <div
               style={{

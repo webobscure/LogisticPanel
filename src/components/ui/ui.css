@@ -347,6 +347,9 @@
   }
 }
 
+.button-top {
+  margin-top: 1rem;
+}
 /* UI date */
 /* Кастомные календарики */
 .custom-datepicker-input {

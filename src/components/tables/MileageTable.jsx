@@ -12,7 +12,7 @@ export default function MileageTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- Используем Date объекты, а не строки ---
+  // --- Используем Date объекты ---
   const [dateFrom, setDateFrom] = useState(new Date("2025-09-10"));
   const [dateTo, setDateTo] = useState(new Date("2025-09-22"));
 
@@ -20,17 +20,16 @@ export default function MileageTable() {
   const perPage = 10;
 
   const API_URL = "https://dlm-agent.ru/api/v1";
-  registerLocale("ru", ru); // регистрируем локаль
+  registerLocale("ru", ru);
 
-  const formatDate = (date, endOfDay = false) => {
+  // --- Форматируем дату в YYYY-MM-DD ---
+  const formatDate = (date) => {
     if (!date) return null;
     const d = new Date(date);
-    if (endOfDay) {
-      d.setHours(23, 59, 59, 999);
-    } else {
-      d.setHours(0, 0, 0, 0);
-    }
-    return d.toISOString();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   // --- Загрузка данных ---
@@ -41,17 +40,19 @@ export default function MileageTable() {
         const token = localStorage.getItem("accessToken");
         if (!token) throw new Error("Нет токена");
 
-        const from = formatDate(dateFrom, false);
-        const to = formatDate(dateTo, true);
+        const from = formatDate(dateFrom);
+        const to = formatDate(dateTo);
 
         // 1. Получаем список машин
         const vehiclesRes = await fetch(`${API_URL}/vehicle/all`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (!vehiclesRes.ok) throw new Error("Ошибка загрузки машин");
         const vehicles = await vehiclesRes.json();
 
         // 2. Получаем пробег
         const allRows = [];
+        let rowId = 0;
         for (const vehicle of vehicles) {
           if (!vehicle.glonass_id) continue;
 
@@ -59,12 +60,12 @@ export default function MileageTable() {
             `${API_URL}/glonass/vehicle-mileage?glonass_id=${vehicle.glonass_id}&from_datetime=${from}&to_datetime=${to}&sampling_interval=86400`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
+          if (!mileageRes.ok) continue;
           const mileageJson = await mileageRes.json();
-
           for (const item of mileageJson) {
-            item.periods.forEach((period, i) => {
+            item.periods.forEach((period) => {
               allRows.push({
-                id: `${i}`,
+                id: `${rowId++}`,
                 status: vehicle.status,
                 type: vehicle.type,
                 name: item.name || vehicle.brand || "-",
@@ -98,13 +99,43 @@ export default function MileageTable() {
     currentPage * perPage
   );
 
+  // --- Скачать Excel ---
+  const downloadExcel = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Нет токена");
+
+      const from = formatDate(dateFrom);
+      const to = formatDate(dateTo);
+      const url = `${API_URL}/glonass/vehicle-mileage/excel?from_datetime=${from}&to_datetime=${to}`;
+
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Ошибка ${res.status}: ${text}`);
+      }
+
+      const blob = await res.blob();
+      const fileUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = fileUrl;
+      a.download = "Пробег.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(fileUrl);
+    } catch (err) {
+      alert("Ошибка при скачивании Excel: " + err.message);
+    }
+  };
+
   return (
     <div className="errorreport bg-card-light">
       <div className="errorreport-title">
         <FaCashRegister /> Пробег за период
       </div>
 
-      {/* --- Календарь с flex --- */}
+      {/* --- Календарь --- */}
       <div
         className="filter-form user-form"
         style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}
@@ -182,7 +213,7 @@ export default function MileageTable() {
         </div>
 
         <div className="button-top">
-          <UiTableButton label="Скачать Excel" style={{ width: "100%", margin: "0 auto" }} />
+          <UiTableButton label="Скачать Excel" style={{ width: "100%", margin: "0 auto" }} onClick={downloadExcel}/>
         </div>
       </div>
     </div>
