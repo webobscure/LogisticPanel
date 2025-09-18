@@ -333,11 +333,14 @@ export default function UsersTable() {
               onChange={(e) =>
                 setNewUser({ ...newUser, surname: e.target.value })
               }
+              className="filter-input"
             />
             <input
               placeholder="Имя"
               value={newUser.name}
               onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+              className="filter-input"
+
             />
             <input
               placeholder="Отчество"
@@ -345,6 +348,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setNewUser({ ...newUser, patronymic: e.target.value })
               }
+              className="filter-input"
+
             />
             <input
               placeholder="Телефон"
@@ -352,6 +357,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setNewUser({ ...newUser, phone: e.target.value })
               }
+              className="filter-input"
+
             />
             <input
               placeholder="Пароль"
@@ -360,6 +367,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setNewUser({ ...newUser, password: e.target.value })
               }
+              className="filter-input"
+
             />
           </div>
           <div
@@ -392,6 +401,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setEditForm({ ...editForm, firstName: e.target.value })
               }
+              className="filter-input"
+
             />
             <input
               placeholder="Фамилия"
@@ -399,6 +410,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setEditForm({ ...editForm, lastName: e.target.value })
               }
+              className="filter-input"
+
             />
             <input
               placeholder="Отчество"
@@ -406,6 +419,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setEditForm({ ...editForm, patronymic: e.target.value })
               }
+              className="filter-input"
+
             />
             <input
               placeholder="Телефон"
@@ -413,6 +428,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setEditForm({ ...editForm, telephone: e.target.value })
               }
+              className="filter-input"
+
             />
             <input
               placeholder="Тг ник"
@@ -420,6 +437,8 @@ export default function UsersTable() {
               onChange={(e) =>
                 setEditForm({ ...editForm, nickname: e.target.value })
               }
+              className="filter-input"
+
             />
           </div>
           <div
